@@ -1,20 +1,53 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ARCHIVE_PATH="${1:-/home/centos/apps/vieted-stage.tgz}"
 APP_DIR="/home/centos/apps/vieted"
 NODE_BIN="$HOME/local/node-v18.18.0-linux-x64-glibc-217/bin/node"
 NPM_CLI="$HOME/local/node-v18.18.0-linux-x64-glibc-217/lib/node_modules/npm/bin/npm-cli.js"
+REPO_URL="git@github.com:nghovi/vieted.git"
+BRANCH="main"
+STASH_ON_DIRTY=1
+
+for arg in "$@"; do
+  case "$arg" in
+    --no-stash)
+      STASH_ON_DIRTY=0
+      ;;
+    *)
+      echo "Unknown option: $arg"
+      echo "Usage: $0 [--no-stash]"
+      exit 1
+      ;;
+  esac
+done
 
 mkdir -p "$APP_DIR"
 cd "$APP_DIR"
 
-if [[ -f "$ARCHIVE_PATH" ]]; then
+if [[ ! -d "$APP_DIR/.git" ]]; then
   find "$APP_DIR" -mindepth 1 -maxdepth 1 ! -name 'vieted.log' -exec rm -rf {} +
-  tar -xzf "$ARCHIVE_PATH" -C "$APP_DIR"
+  git init
+  git remote add origin "$REPO_URL"
+  git fetch origin "$BRANCH"
+  git checkout -B "$BRANCH" "origin/$BRANCH"
+else
+  if [[ -n "$(git status --porcelain)" ]]; then
+    if [[ "$STASH_ON_DIRTY" == "1" ]]; then
+      STASH_NAME="vieted-stage-deploy-$(date +%F-%H%M%S)"
+      git stash save -u "$STASH_NAME" >/dev/null
+    else
+      echo "Working tree has local changes. Re-run without --no-stash or clean manually."
+      exit 1
+    fi
+  fi
+
+  git fetch origin "$BRANCH"
+  git checkout "$BRANCH"
+  git reset --hard "origin/$BRANCH"
 fi
 
 chmod +x "$APP_DIR/apps/web/scripts/stage-run.sh"
+chmod +x "$APP_DIR/apps/web/scripts/install-stage-cert.sh"
 
 if [[ ! -f "$APP_DIR/apps/web/.env.production" ]]; then
   cat > "$APP_DIR/apps/web/.env.production" <<'EOF'
