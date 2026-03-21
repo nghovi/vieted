@@ -1,0 +1,24 @@
+[Unit]
+Description=VietEd Stage Next.js Server
+After=network.target
+
+[Service]
+Type=simple
+User=centos
+WorkingDirectory=/home/centos/apps/vieted
+Environment=NODE_ENV=production
+Environment=PORT=3010
+Environment=HOSTNAME=0.0.0.0
+Environment=DB_HOST=cfd.c7hvdub23zsh.ap-southeast-1.rds.amazonaws.com
+Environment=DB_PORT=3306
+Environment=DB_DATABASE=vieted
+Environment=DB_USERNAME=admin
+EnvironmentFile=-/home/centos/apps/vieted/apps/web/.env.production
+ExecStart=/home/centos/apps/vieted/apps/web/scripts/stage-run.sh
+Restart=always
+RestartSec=5
+StandardOutput=append:/home/centos/apps/vieted/vieted.log
+StandardError=append:/home/centos/apps/vieted/vieted.log
+
+[Install]
+WantedBy=multi-user.target

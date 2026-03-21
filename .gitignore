@@ -1,0 +1,10 @@
+.DS_Store
+node_modules
+.next
+dist
+coverage
+
+apps/web/.next
+apps/web/node_modules
+
+packages/*/node_modules
