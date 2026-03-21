@@ -28,7 +28,7 @@ if [[ ! -d "$APP_DIR/.git" ]]; then
   find "$APP_DIR" -mindepth 1 -maxdepth 1 ! -name 'vieted.log' -exec rm -rf {} +
   git init
   git remote add origin "$REPO_URL"
-  git fetch origin "$BRANCH"
+  git fetch origin "+refs/heads/$BRANCH:refs/remotes/origin/$BRANCH"
   git checkout -B "$BRANCH" "origin/$BRANCH"
 else
   if [[ -n "$(git status --porcelain)" ]]; then
@@ -41,7 +41,7 @@ else
     fi
   fi
 
-  git fetch origin "$BRANCH"
+  git fetch origin "+refs/heads/$BRANCH:refs/remotes/origin/$BRANCH"
   git checkout "$BRANCH"
   git reset --hard "origin/$BRANCH"
 fi
