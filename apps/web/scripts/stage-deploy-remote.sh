@@ -59,6 +59,13 @@ DB_PASSWORD=
 EOF
 fi
 
+if [[ -f "$APP_DIR/apps/web/.env.production" ]]; then
+  set -a
+  # Load persisted stage env values such as DB_PASSWORD before exporting defaults.
+  source "$APP_DIR/apps/web/.env.production"
+  set +a
+fi
+
 export PATH="$HOME/local/node-v18.18.0-linux-x64-glibc-217/bin:$PATH"
 export DB_HOST="${DB_HOST:-cfd.c7hvdub23zsh.ap-southeast-1.rds.amazonaws.com}"
 export DB_PORT="${DB_PORT:-3306}"
