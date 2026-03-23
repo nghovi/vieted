@@ -16,6 +16,7 @@ import {
   verifyPassword,
 } from "./db";
 import { isSmsDeliveryConfigured, sendOtpSms } from "./sms";
+import { isSupportedStudyPreference } from "./study-catalog";
 
 const sessionCookieName = "vieted_session";
 const facebookOauthStateCookieName = "facebook_oauth_state";
@@ -772,6 +773,19 @@ export async function getServerStudyPreference() {
         currentHistoryChapterId: "chuong-1-the-gioi-1918-1945",
         currentGeographyChapterId: "chuong-1-dia-li-dan-cu-viet-nam",
         currentEnglishChapterId: "unit-1-local-community",
+      };
+    }
+
+    if (
+      !isSupportedStudyPreference(
+        preference.currentGrade,
+        preference.currentSubject,
+      )
+    ) {
+      return {
+        ...preference,
+        currentGrade: defaultStudyPreference.currentGrade,
+        currentSubject: defaultStudyPreference.currentSubject,
       };
     }
 

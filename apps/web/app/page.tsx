@@ -27,9 +27,34 @@ import { StudyPreferencesForm } from "./study-preferences-form";
 
 const quickStats = [
   { label: "Khối lớp bắt đầu", value: "Lớp 9" },
-  { label: "Môn học đang hỗ trợ", value: "Lịch sử, Địa lí, Tiếng Anh" },
+  { label: "Môn học trọng tâm", value: "Lịch sử, Toán, Ngữ văn, Tiếng Anh" },
   { label: "Chế độ học", value: "Học, kiểm tra, đánh giá" },
 ];
+
+const previewSubjectContent: Record<
+  string,
+  {
+    title: string;
+    summary: string;
+    eyebrow: string;
+    heading: string;
+  }
+> = {
+  math: {
+    title: "Toán lớp 9 đang được hoàn thiện",
+    summary:
+      "Lộ trình bài học, bài luyện và đánh giá cho Toán đang được chuẩn bị để mở tiếp theo.",
+    eyebrow: "Khởi đầu với Toán 9",
+    heading: "Nội dung Toán lớp 9 sẽ được mở trong các bản cập nhật tới.",
+  },
+  literature: {
+    title: "Ngữ văn lớp 9 đang được hoàn thiện",
+    summary:
+      "Các bài học đọc hiểu, tiếng Việt và làm văn đang được xây dựng để mở tiếp theo.",
+    eyebrow: "Khởi đầu với Ngữ văn 9",
+    heading: "Nội dung Ngữ văn lớp 9 sẽ được mở trong các bản cập nhật tới.",
+  },
+};
 
 const focusAreas = [
   {
@@ -126,42 +151,45 @@ export default async function HomePage() {
   const selectedChapter =
     preference.currentSubject === "history"
       ? selectedHistoryChapter
-      : preference.currentSubject === "geography"
-        ? selectedGeographyChapter
-        : selectedEnglishChapter;
+      : preference.currentSubject === "english"
+        ? selectedEnglishChapter
+        : null;
   const selectedChapters =
     preference.currentSubject === "history"
       ? chapterChoices
-      : preference.currentSubject === "geography"
-        ? geographyChapterChoices
-        : englishChapterChoices;
+      : preference.currentSubject === "english"
+        ? englishChapterChoices
+        : [];
   const selectedEvaluation =
     preference.currentSubject === "history"
       ? historyEvaluation
-      : preference.currentSubject === "geography"
-        ? geographyEvaluation
-        : englishEvaluation;
+      : preference.currentSubject === "english"
+        ? englishEvaluation
+        : null;
   const subjectEyebrow =
     preference.currentSubject === "history"
       ? "Khởi đầu với Lịch sử 9"
-      : preference.currentSubject === "geography"
-        ? "Khởi đầu với Địa lí 9"
-        : "Khởi đầu với Tiếng Anh 9";
+      : preference.currentSubject === "english"
+        ? "Khởi đầu với Tiếng Anh 9"
+        : previewSubjectContent[preference.currentSubject]?.eyebrow ??
+          "Môn học đang hoàn thiện";
   const subjectHeading =
     preference.currentSubject === "history"
       ? "Chủ đề mở đầu cho học sinh lớp 9 môn Lịch sử."
-      : preference.currentSubject === "geography"
-        ? "Chủ đề mở đầu cho học sinh lớp 9 môn Địa lí."
-        : "Bài học mở đầu cho học sinh lớp 9 môn Tiếng Anh.";
+      : preference.currentSubject === "english"
+        ? "Bài học mở đầu cho học sinh lớp 9 môn Tiếng Anh."
+        : previewSubjectContent[preference.currentSubject]?.heading ??
+          "Nội dung môn học đang được cập nhật.";
   const subjectBasePath =
     preference.currentSubject === "history"
       ? "/history/grade-9"
-      : preference.currentSubject === "geography"
-        ? "/geography/grade-9"
-        : "/english/grade-9";
+      : "/english/grade-9";
   const isLoggedIn = Boolean(student);
+  const isLiveSubject =
+    preference.currentSubject === "history" ||
+    preference.currentSubject === "english";
 
-  if (!selectedChapter) {
+  if (isLiveSubject && !selectedChapter) {
     throw new Error("Subject chapters are not available.");
   }
 
@@ -248,44 +276,54 @@ export default async function HomePage() {
               <h2>{subjectHeading}</h2>
             </div>
             <div className="feature-card chapter-feature">
-              <h3>Chương đang chọn</h3>
-              <p>{selectedChapter.title}</p>
-              <p>{selectedChapter.summary}</p>
-              <div className="inline-actions">
-                <Link href={`${subjectBasePath}/${selectedChapter.id}/learn`} className="secondary-link">
-                  Học
-                </Link>
-                <Link href={`${subjectBasePath}/${selectedChapter.id}/test`} className="secondary-link">
-                  Kiểm tra
-                </Link>
-                <Link href={`${subjectBasePath}/${selectedChapter.id}/review`} className="secondary-link">
-                  Đánh giá
-                </Link>
-              </div>
-              {preference.currentSubject === "history" ? (
-                <HistoryChapterForm
-                  initialChapterId={selectedChapter.id}
-                  chapters={selectedChapters.map((chapter) => ({
-                    id: chapter.id,
-                    title: chapter.title,
-                  }))}
-                />
-              ) : preference.currentSubject === "geography" ? (
-                <GeographyChapterForm
-                  initialChapterId={selectedChapter.id}
-                  chapters={selectedChapters.map((chapter) => ({
-                    id: chapter.id,
-                    title: chapter.title,
-                  }))}
-                />
+              {isLiveSubject && selectedChapter ? (
+                <>
+                  <h3>Chương đang chọn</h3>
+                  <p>{selectedChapter.title}</p>
+                  <p>{selectedChapter.summary}</p>
+                  <div className="inline-actions">
+                    <Link href={`${subjectBasePath}/${selectedChapter.id}/learn`} className="secondary-link">
+                      Học
+                    </Link>
+                    <Link href={`${subjectBasePath}/${selectedChapter.id}/test`} className="secondary-link">
+                      Kiểm tra
+                    </Link>
+                    <Link href={`${subjectBasePath}/${selectedChapter.id}/review`} className="secondary-link">
+                      Đánh giá
+                    </Link>
+                  </div>
+                  {preference.currentSubject === "history" ? (
+                    <HistoryChapterForm
+                      initialChapterId={selectedChapter.id}
+                      chapters={selectedChapters.map((chapter) => ({
+                        id: chapter.id,
+                        title: chapter.title,
+                      }))}
+                    />
+                  ) : (
+                    <EnglishChapterForm
+                      initialChapterId={selectedChapter.id}
+                      chapters={selectedChapters.map((chapter) => ({
+                        id: chapter.id,
+                        title: chapter.title,
+                      }))}
+                    />
+                  )}
+                </>
               ) : (
-                <EnglishChapterForm
-                  initialChapterId={selectedChapter.id}
-                  chapters={selectedChapters.map((chapter) => ({
-                    id: chapter.id,
-                    title: chapter.title,
-                  }))}
-                />
+                <>
+                  <h3>
+                    {previewSubjectContent[preference.currentSubject]?.title ??
+                      "Môn học đang được hoàn thiện"}
+                  </h3>
+                  <p>
+                    {previewSubjectContent[preference.currentSubject]?.summary ??
+                      "Nội dung môn học này sẽ được bổ sung sớm."}
+                  </p>
+                  <p className="helper-copy">
+                    Hiện tại trải nghiệm đầy đủ đang có cho Lịch sử và Tiếng Anh.
+                  </p>
+                </>
               )}
             </div>
             <div className="grid">
@@ -309,7 +347,7 @@ export default async function HomePage() {
               <p className="eyebrow">Đánh giá tiến độ</p>
               <h2>Kết quả học tập hiện tại.</h2>
             </div>
-            {selectedEvaluation ? (
+            {selectedEvaluation && isLiveSubject ? (
               <div className="grid">
                 <article className="feature-card">
                   <h3>Tổng quan</h3>
@@ -345,8 +383,12 @@ export default async function HomePage() {
               </div>
             ) : (
               <div className="feature-card chapter-feature">
-                <h3>Chưa có đánh giá</h3>
-                <p>Làm bài kiểm tra để bắt đầu theo dõi tiến độ.</p>
+                <h3>{isLiveSubject ? "Chưa có đánh giá" : "Đánh giá sẽ mở cùng môn học"}</h3>
+                <p>
+                  {isLiveSubject
+                    ? "Làm bài kiểm tra để bắt đầu theo dõi tiến độ."
+                    : "Toán và Ngữ văn đang được chuẩn bị nội dung trước khi mở hệ thống đánh giá."}
+                </p>
               </div>
             )}
           </section>

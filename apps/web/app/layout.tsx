@@ -8,6 +8,9 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Trường Điểm Online",
   description: "AI-backed learning for Vietnamese students in grades 6-12.",
+  other: {
+    "facebook-domain-verification": "2fn41iuevhzspjfr3l6jk47er1272m",
+  },
 };
 
 export default async function RootLayout({

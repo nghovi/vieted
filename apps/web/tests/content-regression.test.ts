@@ -131,10 +131,11 @@ test("english textbook unit anchors stay ordered and bounded", () => {
 
 test("study catalog exposes only supported production choices", () => {
   assert.equal(supportedGrade, 9);
-  assert.deepEqual(availableSubjects, ["history", "geography", "english"]);
+  assert.deepEqual(availableSubjects, ["history", "math", "english", "literature"]);
   assert.equal(isSupportedStudyPreference(9, "history"), true);
-  assert.equal(isSupportedStudyPreference(9, "geography"), true);
+  assert.equal(isSupportedStudyPreference(9, "geography"), false);
+  assert.equal(isSupportedStudyPreference(9, "math"), true);
   assert.equal(isSupportedStudyPreference(9, "english"), true);
-  assert.equal(isSupportedStudyPreference(9, "math"), false);
+  assert.equal(isSupportedStudyPreference(9, "literature"), true);
   assert.equal(isSupportedStudyPreference(8, "history"), false);
 });

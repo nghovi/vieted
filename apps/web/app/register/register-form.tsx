@@ -105,7 +105,7 @@ export function RegisterForm() {
 
   return (
     <div className="auth-stack">
-      <form className="auth-form" onSubmit={handleSubmit}>
+      <form className="auth-form register-form" onSubmit={handleSubmit}>
         <label className="field">
           <span>Số điện thoại</span>
           <input
@@ -118,29 +118,31 @@ export function RegisterForm() {
           />
         </label>
 
-        <label className="field">
-          <span>Mật khẩu</span>
-          <input
-            autoComplete="new-password"
-            name="password"
-            type="password"
-            placeholder="Ít nhất 8 ký tự"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-          />
-        </label>
+        <div className="form-row form-row-split">
+          <label className="field">
+            <span>Mật khẩu</span>
+            <input
+              autoComplete="new-password"
+              name="password"
+              type="password"
+              placeholder="Ít nhất 8 ký tự"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+            />
+          </label>
 
-        <label className="field">
-          <span>Xác nhận mật khẩu</span>
-          <input
-            autoComplete="new-password"
-            name="confirmPassword"
-            type="password"
-            placeholder="Nhập lại mật khẩu"
-            value={confirmPassword}
-            onChange={(event) => setConfirmPassword(event.target.value)}
-          />
-        </label>
+          <label className="field">
+            <span>Xác nhận mật khẩu</span>
+            <input
+              autoComplete="new-password"
+              name="confirmPassword"
+              type="password"
+              placeholder="Nhập lại mật khẩu"
+              value={confirmPassword}
+              onChange={(event) => setConfirmPassword(event.target.value)}
+            />
+          </label>
+        </div>
 
         <div className="otp-panel">
           <div className="otp-panel-header">

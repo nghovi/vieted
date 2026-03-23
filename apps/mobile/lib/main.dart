@@ -195,10 +195,10 @@ const gradeOptions = <GradeOption>[
 
 const subjectOptions = <SubjectOption>[
   SubjectOption(label: 'Lịch sử', isAvailable: true),
-  SubjectOption(label: 'Địa lí', isAvailable: true),
-  SubjectOption(label: 'Toán', isAvailable: false),
+  SubjectOption(label: 'Địa lí', isAvailable: false),
+  SubjectOption(label: 'Toán', isAvailable: true),
   SubjectOption(label: 'Tiếng Anh', isAvailable: true),
-  SubjectOption(label: 'Ngữ văn', isAvailable: false),
+  SubjectOption(label: 'Ngữ văn', isAvailable: true),
   SubjectOption(label: 'Vật lý', isAvailable: false),
   SubjectOption(label: 'Hóa học', isAvailable: false),
 ];
@@ -465,6 +465,12 @@ List<String> chapterOptionsForSubject(String subject) {
   if (subject == 'Tiếng Anh') {
     return englishChapterOptions;
   }
+  if (subject == 'Toán') {
+    return const ['Bài mở đầu. Lộ trình Toán lớp 9'];
+  }
+  if (subject == 'Ngữ văn') {
+    return const ['Bài mở đầu. Lộ trình Ngữ văn lớp 9'];
+  }
   return historyChapterOptions;
 }
 
@@ -475,6 +481,9 @@ String selectedChapterForSession(StudentSession session) {
   if (session.currentSubject == 'Tiếng Anh') {
     return session.currentEnglishChapter;
   }
+  if (session.currentSubject == 'Toán' || session.currentSubject == 'Ngữ văn') {
+    return chapterOptionsForSubject(session.currentSubject).first;
+  }
   return session.currentHistoryChapter;
 }
 
@@ -482,6 +491,30 @@ String selectedChapterForSession(StudentSession session) {
   String subject,
   String chapterTitle,
 ) {
+  if (subject == 'Toán') {
+    return (
+      summary:
+          'Môn Toán lớp 9 đang được chuẩn bị để mở với lộ trình bài học, bài luyện và đánh giá theo từng chủ đề.',
+      keyIdeas: [
+        'Sẽ có lộ trình học theo chủ đề trọng tâm của chương trình lớp 9.',
+        'Bài luyện sẽ được thiết kế theo mức độ từ cơ bản đến nâng cao.',
+        'Đánh giá tiến độ sẽ theo từng mảng kiến thức để học sinh biết phần cần củng cố.',
+      ],
+    );
+  }
+
+  if (subject == 'Ngữ văn') {
+    return (
+      summary:
+          'Môn Ngữ văn lớp 9 đang được chuẩn bị với các phần đọc hiểu, tiếng Việt và làm văn theo từng bài học.',
+      keyIdeas: [
+        'Sẽ có lộ trình học theo nhóm kỹ năng đọc hiểu và tạo lập văn bản.',
+        'Bài luyện sẽ bám sát yêu cầu của chương trình lớp 9.',
+        'Đánh giá tiến độ sẽ giúp học sinh biết phần nào cần ôn thêm.',
+      ],
+    );
+  }
+
   final contentMap = subject == 'Địa lí'
       ? mobileGeographyLearnContent
       : subject == 'Tiếng Anh'
@@ -492,6 +525,10 @@ String selectedChapterForSession(StudentSession session) {
 }
 
 int chapterStartPageForSubject(String subject, String chapterTitle) {
+  if (subject == 'Toán' || subject == 'Ngữ văn') {
+    return 0;
+  }
+
   final pageMap = subject == 'Địa lí'
       ? mobileGeographyChapterStartPages
       : subject == 'Tiếng Anh'
@@ -1021,7 +1058,11 @@ class _StudentHomePageState extends State<StudentHomePage> {
               subtitle:
                   '${widget.appState.session!.currentSubject} • ${selectedChapterForSession(widget.appState.session!)}',
               detail:
-                  'Đọc tóm tắt chương, nắm ý chính và các mốc sự kiện quan trọng trước khi làm bài.',
+                  widget.appState.session!.currentSubject == 'Tiếng Anh'
+                      ? 'Đọc nội dung bài học, nắm từ vựng, mẫu câu và ý chính trước khi làm bài.'
+                      : widget.appState.session!.currentSubject == 'Lịch sử'
+                          ? 'Đọc tóm tắt chương, nắm ý chính và các mốc sự kiện quan trọng trước khi làm bài.'
+                          : 'Xem trước lộ trình môn học đang được chuẩn bị trong ứng dụng.',
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute<void>(
@@ -1786,6 +1827,10 @@ class _StudentLearnPageState extends State<StudentLearnPage> {
                         ? 'Nắm đặc điểm nổi bật, các ý chính và mối liên hệ lãnh thổ của chương trước khi làm bài kiểm tra.'
                         : widget.subjectLabel == 'Tiếng Anh'
                             ? 'Nắm từ vựng, mẫu câu, chủ điểm ngữ pháp và tình huống giao tiếp chính trước khi làm bài kiểm tra.'
+                        : widget.subjectLabel == 'Toán'
+                            ? 'Xem trước cấu trúc môn học, dạng bài trọng tâm và lộ trình nội dung sẽ được mở tiếp theo.'
+                            : widget.subjectLabel == 'Ngữ văn'
+                                ? 'Xem trước nhóm kỹ năng đọc hiểu, tiếng Việt và làm văn sẽ được mở trong các đợt tới.'
                         : 'Nắm bối cảnh, các mốc thời gian, nhân vật và ý chính của chương trước khi làm bài kiểm tra.',
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: const Color(0xFF5D6F68),
@@ -1816,6 +1861,10 @@ class _StudentLearnPageState extends State<StudentLearnPage> {
                     Text(
                       widget.subjectLabel == 'Tiếng Anh'
                           ? 'Nguồn cấu trúc bài học: Tiếng Anh 9 - Global Success.'
+                          : widget.subjectLabel == 'Toán'
+                              ? 'Lộ trình môn Toán lớp 9 đang được hoàn thiện.'
+                              : widget.subjectLabel == 'Ngữ văn'
+                                  ? 'Lộ trình môn Ngữ văn lớp 9 đang được hoàn thiện.'
                           : 'Nguồn cấu trúc chương: Lịch sử và Địa lí 9 - Kết nối tri thức với cuộc sống.',
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: const Color(0xFF5D6F68),
@@ -1824,7 +1873,9 @@ class _StudentLearnPageState extends State<StudentLearnPage> {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      '$mobileTextbookNotLoadedMessage Trang neo hiện tại: $chapterStartPage.',
+                      (widget.subjectLabel == 'Toán' || widget.subjectLabel == 'Ngữ văn')
+                          ? 'Môn học này đang ở giai đoạn chuẩn bị nội dung. Ứng dụng sẽ mở bài học, bài luyện và đánh giá trong các bản cập nhật tới.'
+                          : '$mobileTextbookNotLoadedMessage Trang neo hiện tại: $chapterStartPage.',
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: const Color(0xFF5D6F68),
                         height: 1.5,

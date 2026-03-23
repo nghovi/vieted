@@ -4,7 +4,7 @@ import { RegisterForm } from "./register-form";
 export default function RegisterPage() {
   return (
     <main className="page-shell auth-page">
-      <section className="hero auth-hero">
+      <section className="hero auth-hero auth-hero-balanced">
         <div className="hero-copy">
           <p className="eyebrow">Đăng ký tài khoản</p>
           <h1>Tạo tài khoản Trường Điểm Online bằng số điện thoại.</h1>
@@ -19,7 +19,7 @@ export default function RegisterPage() {
           </div>
         </div>
 
-        <div className="hero-card auth-card">
+        <div className="hero-card auth-card auth-card-tight">
           <h2>Bắt đầu hồ sơ học sinh</h2>
           <RegisterForm />
           <div className="inline-actions">
