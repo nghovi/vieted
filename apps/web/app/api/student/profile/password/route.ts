@@ -45,7 +45,7 @@ export async function PATCH(request: Request) {
 
   if (dbStudent.authProvider !== "phone" || !dbStudent.passwordHash) {
     return NextResponse.json(
-      { message: "Tài khoản này không dùng mật khẩu nội bộ của VietEd." },
+      { message: "Tài khoản này không dùng mật khẩu nội bộ của Trường Điểm Online." },
       { status: 400 },
     );
   }

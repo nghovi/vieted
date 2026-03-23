@@ -171,7 +171,7 @@ export default async function HomePage() {
     <main className="page-shell">
       <section className="hero">
         <div className="hero-copy">
-          <p className="eyebrow">VietEd</p>
+          <p className="eyebrow">Trường Điểm Online</p>
           <h1>Nền tảng học tập có AI cho học sinh Việt Nam, thiết kế cho thói quen học thật.</h1>
           <p className="lede">
             Học sinh lưu lớp hiện tại, chọn môn muốn học, rồi đi vào luồng bài học,

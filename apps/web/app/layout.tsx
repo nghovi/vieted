@@ -4,7 +4,7 @@ import { getServerSessionStudent } from "@/lib/auth";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "VietEd",
+  title: "Trường Điểm Online",
   description: "AI-backed learning for Vietnamese students in grades 6-12.",
 };
 

@@ -134,7 +134,7 @@ export function ProfileSettings({
     <div className="grid profile-grid">
       <section className="feature-card">
         <h3>Biệt danh</h3>
-        <p>Chọn tên gọi thân thuộc để VietEd hiển thị đúng cách em muốn.</p>
+        <p>Chọn tên gọi thân thuộc để Trường Điểm Online hiển thị đúng cách em muốn.</p>
         <div className="auth-form">
           <label className="field">
             <span>Biệt danh hiển thị</span>

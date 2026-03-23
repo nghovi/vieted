@@ -19,7 +19,7 @@ export default async function ProfilePage() {
           <p className="eyebrow">Hồ sơ học sinh</p>
           <h1>Quản lý tài khoản học tập của em tại một nơi duy nhất.</h1>
           <p className="lede">
-            Đây là nơi để đổi mật khẩu, cập nhật ảnh đại diện và đăng xuất an toàn khỏi VietEd.
+            Đây là nơi để đổi mật khẩu, cập nhật ảnh đại diện và đăng xuất an toàn khỏi Trường Điểm Online.
           </p>
           <div className="session-banner profile-summary">
             <span
@@ -70,7 +70,7 @@ export default async function ProfilePage() {
             </li>
             <li>
               <span>Ảnh đại diện</span>
-              <strong>Chọn từ bộ avatar của VietEd</strong>
+              <strong>Chọn từ bộ avatar của Trường Điểm Online</strong>
             </li>
           </ul>
         </div>

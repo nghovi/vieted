@@ -7,7 +7,7 @@ export default function RegisterPage() {
       <section className="hero auth-hero">
         <div className="hero-copy">
           <p className="eyebrow">Đăng ký tài khoản</p>
-          <h1>Tạo tài khoản VietEd bằng số điện thoại hoặc mạng xã hội quen dùng.</h1>
+          <h1>Tạo tài khoản Trường Điểm Online bằng số điện thoại hoặc mạng xã hội quen dùng.</h1>
           <p className="lede">
             Học sinh có thể đăng ký bằng số điện thoại, hoặc tạo tài khoản bằng Gmail,
             Facebook, và TikTok để vào học nhanh hơn trong những lần sau.

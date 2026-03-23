@@ -20,7 +20,7 @@ export default function LoginPage() {
         </div>
 
         <div className="hero-card auth-card">
-          <h2>Bắt đầu với VietEd</h2>
+          <h2>Bắt đầu với Trường Điểm Online</h2>
           <LoginForm />
           <p className="helper-copy">
             Sau khi xác thực, trang chủ sẽ đọc session ở phía server để hiển thị thông tin học sinh.

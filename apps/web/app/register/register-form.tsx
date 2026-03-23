@@ -118,7 +118,7 @@ export function RegisterForm() {
         <div>
           <h3>Đăng ký bằng TikTok, Facebook hoặc Gmail</h3>
           <p className="helper-copy">
-            VietEd sẽ lưu tài khoản mạng xã hội này làm phương thức đăng nhập cho học sinh.
+            Trường Điểm Online sẽ lưu tài khoản mạng xã hội này làm phương thức đăng nhập cho học sinh.
           </p>
         </div>
         <SocialAuthForm mode="register" />

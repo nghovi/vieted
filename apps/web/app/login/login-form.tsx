@@ -85,7 +85,7 @@ export function LoginForm() {
         <div>
           <h3>Đăng nhập bằng TikTok, Facebook hoặc Gmail</h3>
           <p className="helper-copy">
-            Chọn nhà cung cấp và nhập mã tài khoản đã dùng khi đăng ký trên VietEd.
+            Chọn nhà cung cấp và nhập mã tài khoản đã dùng khi đăng ký trên Trường Điểm Online.
           </p>
         </div>
         <SocialAuthForm mode="login" />

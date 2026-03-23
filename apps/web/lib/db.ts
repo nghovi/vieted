@@ -511,7 +511,7 @@ export async function createStudentAccount(
       ? `Học sinh ${phoneNumber.slice(-4)}`
       : email
         ? email.split("@")[0]
-        : "Học sinh VietEd");
+        : "Học sinh Trường Điểm Online");
   const grade = options.grade ?? 9;
   const passwordHash = options.password ? createPasswordHash(options.password) : null;
   const avatarKey = studentAvatarPresets[0].key;
