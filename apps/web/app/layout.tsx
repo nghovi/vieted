@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { getServerSessionStudent } from "@/lib/auth";
 import "./globals.css";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Trường Điểm Online",
   description: "AI-backed learning for Vietnamese students in grades 6-12.",

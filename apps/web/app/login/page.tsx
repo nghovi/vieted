@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { LoginForm } from "./login-form";
 
@@ -24,7 +25,9 @@ export default function LoginPage() {
 
         <div className="hero-card auth-card">
           <h2>Bắt đầu với Trường Điểm Online</h2>
-          <LoginForm />
+          <Suspense fallback={null}>
+            <LoginForm />
+          </Suspense>
         </div>
       </section>
     </main>
