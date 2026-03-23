@@ -4,7 +4,9 @@ import { getServerSessionStudent } from "@/lib/auth";
 import {
   getHistoryQuestionSetByIdFromDb,
   getLatestHistoryQuestionSetAttempt,
+  listHistoryQuestionSetsWithProgress,
 } from "@/lib/db";
+import { ScoreTrendChart } from "../../score-trend-chart";
 import { HistoryTestForm } from "../history-test-form";
 
 type Props = {
@@ -28,10 +30,13 @@ export default async function HistorySetAttemptPage({ params }: Props) {
     chapterId,
     setId,
   );
+  const chapterProgress = await listHistoryQuestionSetsWithProgress(student.dbId, chapterId);
 
-  if (!questionSet) {
+  if (!questionSet || !chapterProgress) {
     notFound();
   }
+
+  const setProgress = chapterProgress.find((item) => item.setId === setId);
 
   return (
     <main className="page-shell">
@@ -88,7 +93,24 @@ export default async function HistorySetAttemptPage({ params }: Props) {
       </section>
 
       <section className="content-section">
+        <div className="feature-card">
+          <div className="test-toolbar">
+            <div>
+              <h2>Tiến độ của bộ kiểm tra này</h2>
+              <p>
+                Xem điểm các lần làm để biết mình đang tiến bộ ổn định hay cần làm lại
+                thêm.
+              </p>
+            </div>
+            <span className="test-progress-badge">
+              {setProgress?.bestScore !== null ? `Cao nhất ${setProgress?.bestScore}%` : "Chưa có dữ liệu"}
+            </span>
+          </div>
+          <ScoreTrendChart points={setProgress?.attemptHistory ?? []} />
+        </div>
+
         <HistoryTestForm
+          attemptHistory={setProgress?.attemptHistory ?? []}
           chapterId={chapterId}
           questions={questionSet.questions.map((question) => ({
             id: question.id,

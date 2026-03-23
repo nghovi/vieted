@@ -1,20 +1,30 @@
 import Link from "next/link";
 import {
+  getServerSelectedEnglishChapter,
+  getServerSelectedGeographyChapter,
   getServerSelectedHistoryChapter,
   getServerSessionStudent,
   getServerStudyPreference,
 } from "@/lib/auth";
 import {
+  getEnglishChapterByIdFromDb,
+  getEnglishEvaluationOverview,
+  getGeographyChapterByIdFromDb,
+  getGeographyEvaluationOverview,
+  listEnglishChaptersFromDb,
+  listGeographyChaptersFromDb,
   getHistoryChapterByIdFromDb,
   getHistoryEvaluationOverview,
   listHistoryChaptersFromDb,
 } from "@/lib/db";
+import { EnglishChapterForm } from "./english-chapter-form";
+import { GeographyChapterForm } from "./geography-chapter-form";
 import { HistoryChapterForm } from "./history-chapter-form";
 import { StudyPreferencesForm } from "./study-preferences-form";
 
 const quickStats = [
   { label: "Khối lớp bắt đầu", value: "Lớp 9" },
-  { label: "Môn học đầu tiên", value: "Lịch sử" },
+  { label: "Môn học đang hỗ trợ", value: "Lịch sử, Địa lí, Tiếng Anh" },
   { label: "Chế độ học", value: "Học, kiểm tra, đánh giá" },
 ];
 
@@ -36,16 +46,9 @@ const focusAreas = [
   },
 ];
 
-const roadmap = [
-  "Đăng nhập bằng số điện thoại và mật khẩu cho cả web và Flutter",
-  "Lưu lớp hiện tại từ 1 đến 12 và môn học đang học",
-  "Bản đồ chủ đề Lịch sử lớp 9 để bắt đầu nhanh và dễ đo lường",
-  "Trợ lý AI bằng tiếng Việt, ưu tiên gợi ý trước khi đưa đáp án",
-  "Bảng đánh giá tiến độ cho học sinh và tổng kết hằng tuần cho phụ huynh",
-];
-
 const subjectLabels: Record<string, string> = {
   history: "Lịch sử",
+  geography: "Địa lí",
   math: "Toán",
   english: "Tiếng Anh",
   literature: "Ngữ văn",
@@ -57,48 +60,112 @@ export default async function HomePage() {
   const student = await getServerSessionStudent();
   const preference = await getServerStudyPreference();
   const selectedHistoryChapterId = await getServerSelectedHistoryChapter();
+  const selectedGeographyChapterId = await getServerSelectedGeographyChapter();
+  const selectedEnglishChapterId = await getServerSelectedEnglishChapter();
   const chapters = await listHistoryChaptersFromDb();
+  const geographyChapters = await listGeographyChaptersFromDb();
+  const englishChapters = await listEnglishChaptersFromDb();
   const selectedHistoryChapter =
     (await getHistoryChapterByIdFromDb(selectedHistoryChapterId)) ??
     (chapters[0]
       ? await getHistoryChapterByIdFromDb(chapters[0].id)
       : null);
+  const selectedGeographyChapter =
+    (await getGeographyChapterByIdFromDb(selectedGeographyChapterId)) ??
+    (geographyChapters[0]
+      ? await getGeographyChapterByIdFromDb(geographyChapters[0].id)
+      : null);
+  const selectedEnglishChapter =
+    (await getEnglishChapterByIdFromDb(selectedEnglishChapterId)) ??
+    (englishChapters[0]
+      ? await getEnglishChapterByIdFromDb(englishChapters[0].id)
+      : null);
   const subjectLabel =
     subjectLabels[preference.currentSubject] ?? preference.currentSubject;
   const historyEvaluation =
     student ? await getHistoryEvaluationOverview(student.dbId) : null;
+  const geographyEvaluation =
+    student ? await getGeographyEvaluationOverview(student.dbId) : null;
+  const englishEvaluation =
+    student ? await getEnglishEvaluationOverview(student.dbId) : null;
+  const selectedChapter =
+    preference.currentSubject === "history"
+      ? selectedHistoryChapter
+      : preference.currentSubject === "geography"
+        ? selectedGeographyChapter
+        : selectedEnglishChapter;
+  const selectedChapters =
+    preference.currentSubject === "history"
+      ? chapters
+      : preference.currentSubject === "geography"
+        ? geographyChapters
+        : englishChapters;
+  const selectedEvaluation =
+    preference.currentSubject === "history"
+      ? historyEvaluation
+      : preference.currentSubject === "geography"
+        ? geographyEvaluation
+        : englishEvaluation;
+  const subjectEyebrow =
+    preference.currentSubject === "history"
+      ? "Khởi đầu với Lịch sử 9"
+      : preference.currentSubject === "geography"
+        ? "Khởi đầu với Địa lí 9"
+        : "Khởi đầu với Tiếng Anh 9";
+  const subjectHeading =
+    preference.currentSubject === "history"
+      ? "Chủ đề mở đầu cho học sinh lớp 9 môn Lịch sử."
+      : preference.currentSubject === "geography"
+        ? "Chủ đề mở đầu cho học sinh lớp 9 môn Địa lí."
+        : "Bài học mở đầu cho học sinh lớp 9 môn Tiếng Anh.";
+  const subjectBasePath =
+    preference.currentSubject === "history"
+      ? "/history/grade-9"
+      : preference.currentSubject === "geography"
+        ? "/geography/grade-9"
+        : "/english/grade-9";
 
-  if (!selectedHistoryChapter) {
-    throw new Error("History chapters are not available.");
+  if (!selectedChapter) {
+    throw new Error("Subject chapters are not available.");
   }
 
   return (
     <main className="page-shell">
       <section className="hero">
         <div className="hero-copy">
-          <p className="eyebrow">VietEd MVP</p>
+          <p className="eyebrow">VietEd</p>
           <h1>Nền tảng học tập có AI cho học sinh Việt Nam, thiết kế cho thói quen học thật.</h1>
           <p className="lede">
-            Chúng ta bắt đầu với Lịch sử lớp 9: học sinh lưu lớp hiện tại, chọn
-            môn muốn học, rồi đi vào luồng bài học, kiểm tra và đánh giá có cấu trúc.
+            Học sinh lưu lớp hiện tại, chọn môn muốn học, rồi đi vào luồng bài học,
+            kiểm tra và đánh giá có cấu trúc.
           </p>
           {student ? (
             <div className="session-banner">
               <strong>{student.fullName}</strong>
               <span>
-                Lớp {student.grade} • {student.phoneNumber}
+                Lớp {student.grade} • {student.contactLabel}
               </span>
             </div>
           ) : (
             <div className="session-banner">
               <strong>Chưa đăng nhập</strong>
-              <span>Đăng nhập bằng số điện thoại để lưu tiến độ học tập.</span>
+              <span>Đăng nhập hoặc đăng ký để lưu tiến độ học tập.</span>
             </div>
           )}
           <div className="hero-actions">
             <Link href="/login" className="primary-link">
-              {student ? "Vào tài khoản" : "Đăng nhập"}
+              {student ? "Đổi tài khoản" : "Đăng nhập"}
             </Link>
+            {!student ? (
+              <Link href="/register" className="secondary-link">
+                Đăng ký
+              </Link>
+            ) : null}
+            {student ? (
+              <Link href="/profile" className="secondary-link">
+                Hồ sơ
+              </Link>
+            ) : null}
             <a href="#focus" className="secondary-link">
               Luồng học tập
             </a>
@@ -138,41 +205,50 @@ export default async function HomePage() {
 
       <section className="content-section">
         <div className="section-heading">
-          <p className="eyebrow">Khởi đầu với Lịch sử 9</p>
-          <h2>Chủ đề mở đầu cho học sinh lớp 9 môn Lịch sử.</h2>
+          <p className="eyebrow">{subjectEyebrow}</p>
+          <h2>{subjectHeading}</h2>
         </div>
         <div className="feature-card chapter-feature">
           <h3>Chương đang chọn</h3>
-          <p>{selectedHistoryChapter.title}</p>
-          <p>{selectedHistoryChapter.summary}</p>
+          <p>{selectedChapter.title}</p>
+          <p>{selectedChapter.summary}</p>
           <div className="inline-actions">
-            <Link
-              href={`/history/grade-9/${selectedHistoryChapter.id}/learn`}
-              className="secondary-link"
-            >
+            <Link href={`${subjectBasePath}/${selectedChapter.id}/learn`} className="secondary-link">
               Học
             </Link>
-            <Link
-              href={`/history/grade-9/${selectedHistoryChapter.id}/test`}
-              className="secondary-link"
-            >
+            <Link href={`${subjectBasePath}/${selectedChapter.id}/test`} className="secondary-link">
               Kiểm tra
             </Link>
-            <Link
-              href={`/history/grade-9/${selectedHistoryChapter.id}/review`}
-              className="secondary-link"
-            >
+            <Link href={`${subjectBasePath}/${selectedChapter.id}/review`} className="secondary-link">
               Đánh giá
             </Link>
           </div>
           {student ? (
-            <HistoryChapterForm
-              initialChapterId={selectedHistoryChapter.id}
-              chapters={chapters.map((chapter) => ({
-                id: chapter.id,
-                title: chapter.title,
-              }))}
-            />
+            preference.currentSubject === "history" ? (
+              <HistoryChapterForm
+                initialChapterId={selectedChapter.id}
+                chapters={selectedChapters.map((chapter) => ({
+                  id: chapter.id,
+                  title: chapter.title,
+                }))}
+              />
+            ) : preference.currentSubject === "geography" ? (
+              <GeographyChapterForm
+                initialChapterId={selectedChapter.id}
+                chapters={selectedChapters.map((chapter) => ({
+                  id: chapter.id,
+                  title: chapter.title,
+                }))}
+              />
+            ) : (
+              <EnglishChapterForm
+                initialChapterId={selectedChapter.id}
+                chapters={selectedChapters.map((chapter) => ({
+                  id: chapter.id,
+                  title: chapter.title,
+                }))}
+              />
+            )
           ) : (
             <p className="helper-copy">
               Đăng nhập để lưu chương học và xem bộ câu hỏi trên server.
@@ -206,36 +282,36 @@ export default async function HomePage() {
           <p className="eyebrow">Đánh giá tiến độ</p>
           <h2>Kết quả học tập hiện tại của học sinh.</h2>
         </div>
-        {student && historyEvaluation ? (
+        {student && selectedEvaluation ? (
           <div className="grid">
             <article className="feature-card">
               <h3>Tổng quan</h3>
               <p>
-                Hoàn thành học {historyEvaluation.completedLearningChapters}/
-                {historyEvaluation.totalChapters} chương.
+                Hoàn thành học {selectedEvaluation.completedLearningChapters}/
+                {selectedEvaluation.totalChapters} chương.
               </p>
               <p>
-                Đã làm {historyEvaluation.attemptedSets}/
-                {historyEvaluation.totalSets} bộ kiểm tra.
+                Đã làm {selectedEvaluation.attemptedSets}/
+                {selectedEvaluation.totalSets} bộ kiểm tra.
               </p>
             </article>
             <article className="feature-card">
               <h3>Điểm số</h3>
               <p>
                 Điểm trung bình:{" "}
-                {historyEvaluation.averageScore !== null
-                  ? `${historyEvaluation.averageScore}%`
+                {selectedEvaluation.averageScore !== null
+                  ? `${selectedEvaluation.averageScore}%`
                   : "Chưa có dữ liệu"}
               </p>
               <p>
-                Chương tốt nhất: {historyEvaluation.strongestChapter ?? "Chưa xác định"}
+                Chương tốt nhất: {selectedEvaluation.strongestChapter ?? "Chưa xác định"}
               </p>
             </article>
             <article className="feature-card">
               <h3>Cần chú ý</h3>
               <p>
                 Ưu tiên xem lại:{" "}
-                {historyEvaluation.needsAttentionChapter ?? "Chưa có dữ liệu kiểm tra"}
+                {selectedEvaluation.needsAttentionChapter ?? "Chưa có dữ liệu kiểm tra"}
               </p>
               <p>
                 Hãy vào mục Đánh giá của từng chương để xem chi tiết từng bộ bài đã làm.
@@ -263,18 +339,6 @@ export default async function HomePage() {
             </article>
           ))}
         </div>
-      </section>
-
-      <section id="roadmap" className="content-section roadmap">
-        <div className="section-heading">
-          <p className="eyebrow">Kế hoạch triển khai</p>
-          <h2>Những gì nên hoàn thiện trước khi mở rộng sang môn khác.</h2>
-        </div>
-        <ol>
-          {roadmap.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ol>
       </section>
     </main>
   );

@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { getServerSessionStudent } from "@/lib/auth";
 import { saveStudentStudyPreference } from "@/lib/db";
-
-const availableGrade = 9;
-const availableSubjects = new Set(["history"]);
+import {
+  isSupportedStudyPreference,
+  supportedGrade,
+} from "@/lib/study-catalog";
 
 export async function POST(request: Request) {
   const student = await getServerSessionStudent();
@@ -19,20 +20,20 @@ export async function POST(request: Request) {
 
   if (
     typeof body.currentGrade !== "number" ||
-    body.currentGrade !== availableGrade
+    body.currentGrade !== supportedGrade
   ) {
     return NextResponse.json(
-      { error: "Hiện tại VietEd mới hỗ trợ lớp 9 trong giai đoạn ra mắt đầu tiên." },
+      { error: "Hiện tại hệ thống hỗ trợ lớp 9." },
       { status: 400 },
     );
   }
 
   if (
     typeof body.currentSubject !== "string" ||
-    !availableSubjects.has(body.currentSubject)
+    !isSupportedStudyPreference(body.currentGrade, body.currentSubject)
   ) {
     return NextResponse.json(
-      { error: "Hiện tại VietEd mới hỗ trợ môn Lịch sử." },
+      { error: "Môn học chưa hợp lệ hoặc chưa khả dụng." },
       { status: 400 },
     );
   }

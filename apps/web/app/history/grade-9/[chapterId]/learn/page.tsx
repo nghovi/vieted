@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import {
+  getGrade9HistoryChapterEndPage,
+  getGrade9HistoryChapterStartPage,
+} from "@/lib/history-textbook";
 import { getHistoryChapterByIdFromDb } from "@/lib/db";
+import { LearnTextbookPanel } from "./learn-textbook-panel";
 
 type Props = {
   params: Promise<{
@@ -60,16 +65,19 @@ export default async function HistoryLearnPage({ params }: Props) {
 
       <section className="content-section">
         <div className="section-heading">
-          <p className="eyebrow">Tổng quan chương</p>
-          <h2>Những gì em cần nắm chắc trước khi làm bài.</h2>
+          <p className="eyebrow">Chuẩn bị trước khi đọc</p>
+          <h2>Nhìn nhanh khung học trước, rồi mở nội dung chương khi em sẵn sàng.</h2>
         </div>
         <div className="grid">
           <article className="feature-card">
-            <h3>Tóm tắt nội dung</h3>
-            <p>{chapter.modeContent.learn.overview}</p>
+            <h3>Mục tiêu của trang học</h3>
+            <p>
+              Em bắt đầu bằng việc nắm khung kiến thức, sau đó bấm vào nút đọc sách giáo
+              khoa để mở phần nội dung chương.
+            </p>
           </article>
           <article className="feature-card">
-            <h3>Ý chính cần nhớ</h3>
+            <h3>Ý chính sẽ gặp trong chương</h3>
             <ul className="options-list">
               {chapter.modeContent.learn.keyIdeas.map((idea) => (
                 <li key={idea}>{idea}</li>
@@ -79,12 +87,18 @@ export default async function HistoryLearnPage({ params }: Props) {
           <article className="feature-card">
             <h3>Cách học gợi ý</h3>
             <p>
-              Đọc tóm tắt trước, tự ghi lại các mốc thời gian và nhân vật quan trọng, sau
-              đó mới chuyển sang phần kiểm tra để đo mức độ hiểu bài.
+              Đọc nội dung chương, tự ghi lại các mốc thời gian và nhân vật quan trọng,
+              rồi mới chuyển sang phần kiểm tra để đo mức độ hiểu bài.
             </p>
           </article>
         </div>
       </section>
+
+      <LearnTextbookPanel
+        chapterTitle={chapter.title}
+        chapterStartPage={getGrade9HistoryChapterStartPage(chapterId)}
+        chapterEndPage={getGrade9HistoryChapterEndPage(chapterId)}
+      />
     </main>
   );
 }

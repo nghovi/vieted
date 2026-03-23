@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VietEd PDF Viewer</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f6f2ea;
+        --surface: #fffaf1;
+        --text: #163127;
+        --muted: #5d6f68;
+        --line: rgba(22, 49, 39, 0.1);
+        --accent: #db6b2d;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: Georgia, "Times New Roman", serif;
+      }
+
+      .viewer {
+        min-height: 100vh;
+        display: grid;
+        grid-template-rows: auto 1fr;
+      }
+
+      .toolbar {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(255, 250, 241, 0.94);
+        backdrop-filter: blur(8px);
+      }
+
+      .toolbar-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+
+      button,
+      a {
+        min-height: 40px;
+        padding: 0 14px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: white;
+        color: var(--text);
+        text-decoration: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font: inherit;
+      }
+
+      .primary {
+        background: var(--accent);
+        color: white;
+        border-color: transparent;
+      }
+
+      .status {
+        color: var(--muted);
+      }
+
+      .canvas-wrap {
+        padding: 18px;
+        overflow: auto;
+        display: grid;
+        gap: 18px;
+        justify-items: center;
+      }
+
+      canvas {
+        max-width: 100%;
+        height: auto;
+        box-shadow: 0 24px 40px rgba(64, 44, 18, 0.14);
+        background: white;
+      }
+
+      .page-card {
+        display: grid;
+        gap: 10px;
+        justify-items: center;
+      }
+
+      .page-label {
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      .message {
+        padding: 24px;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="viewer">
+      <div class="toolbar">
+        <div class="toolbar-group">
+          <button id="prev">Trang trước</button>
+          <button id="next">Trang sau</button>
+          <button id="zoom-out">Thu nhỏ</button>
+          <button id="zoom-in">Phóng to</button>
+        </div>
+        <div class="toolbar-group status">
+          <span id="status">Đang tải sách giáo khoa...</span>
+        </div>
+        <div class="toolbar-group">
+          <a id="open-pdf" class="primary" target="_blank" rel="noreferrer">Mở PDF gốc</a>
+        </div>
+      </div>
+      <div class="canvas-wrap">
+        <canvas id="pdf-canvas"></canvas>
+        <div id="message" class="message" hidden></div>
+      </div>
+    </div>
+
+    <script type="module">
+      import * as pdfjsLib from "/pdfjs/pdf.mjs";
+
+      pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdfjs/pdf.worker.mjs";
+
+      const params = new URLSearchParams(window.location.search);
+      const file = params.get("file");
+      const initialPage = Number(params.get("page") || "1");
+      const chapterEnd = Number(params.get("chapterEnd") || "0");
+
+      const prevButton = document.getElementById("prev");
+      const nextButton = document.getElementById("next");
+      const zoomOutButton = document.getElementById("zoom-out");
+      const zoomInButton = document.getElementById("zoom-in");
+      const statusNode = document.getElementById("status");
+      const openPdfLink = document.getElementById("open-pdf");
+      const canvasWrap = document.querySelector(".canvas-wrap");
+      const message = document.getElementById("message");
+
+      let pdfDoc = null;
+      let currentPage = initialPage;
+      let zoom = 1.15;
+      let renderToken = 0;
+
+      openPdfLink.href = `${file || ""}#page=${initialPage}&view=FitH`;
+
+      function clampChapterPage(pageNumber) {
+        if (!pdfDoc) return pageNumber;
+        const lastPage = chapterEnd > 0 ? Math.min(chapterEnd, pdfDoc.numPages) : pdfDoc.numPages;
+        return Math.min(Math.max(pageNumber, initialPage), lastPage);
+      }
+
+      async function renderPages() {
+        if (!pdfDoc) return;
+        const token = ++renderToken;
+        const lastPage = chapterEnd > 0 ? Math.min(chapterEnd, pdfDoc.numPages) : pdfDoc.numPages;
+        statusNode.textContent = `Đang tải các trang ${initialPage} - ${lastPage}...`;
+        canvasWrap.querySelectorAll(".page-card").forEach((node) => node.remove());
+
+        for (let pageNumber = initialPage; pageNumber <= lastPage; pageNumber += 1) {
+          if (token !== renderToken) {
+            return;
+          }
+
+          const page = await pdfDoc.getPage(pageNumber);
+          const viewport = page.getViewport({ scale: zoom });
+          const card = document.createElement("div");
+          card.className = "page-card";
+          card.dataset.page = String(pageNumber);
+
+          const label = document.createElement("div");
+          label.className = "page-label";
+          label.textContent = `Trang ${pageNumber}`;
+
+          const canvas = document.createElement("canvas");
+          const context = canvas.getContext("2d");
+          if (!context) continue;
+
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+
+          card.appendChild(label);
+          card.appendChild(canvas);
+          canvasWrap.insertBefore(card, message);
+
+          await page.render({
+            canvas,
+            canvasContext: context,
+            viewport,
+          }).promise;
+        }
+
+        currentPage = clampChapterPage(currentPage);
+        statusNode.textContent = `Đang đọc trang ${currentPage} / ${lastPage}`;
+        prevButton.disabled = currentPage <= initialPage;
+        nextButton.disabled = currentPage >= lastPage;
+      }
+
+      function scrollToPage(pageNumber) {
+        currentPage = clampChapterPage(pageNumber);
+        const target = canvasWrap.querySelector(`[data-page="${currentPage}"]`);
+        if (target) {
+          target.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        if (pdfDoc) {
+          const lastPage = chapterEnd > 0 ? Math.min(chapterEnd, pdfDoc.numPages) : pdfDoc.numPages;
+          statusNode.textContent = `Đang đọc trang ${currentPage} / ${lastPage}`;
+          prevButton.disabled = currentPage <= initialPage;
+          nextButton.disabled = currentPage >= lastPage;
+        }
+      }
+
+      async function boot() {
+        if (!file) {
+          message.hidden = false;
+          message.textContent = "Thiếu đường dẫn tới tệp PDF.";
+          statusNode.textContent = "Không thể tải PDF";
+          return;
+        }
+
+        try {
+          const task = pdfjsLib.getDocument(file);
+          pdfDoc = await task.promise;
+          message.hidden = true;
+          await renderPages();
+          scrollToPage(initialPage);
+        } catch (error) {
+          message.hidden = false;
+          message.textContent = error instanceof Error ? error.message : "Không thể tải PDF.";
+          statusNode.textContent = "Không thể tải PDF";
+        }
+      }
+
+      prevButton.addEventListener("click", async () => {
+        if (currentPage <= initialPage) return;
+        scrollToPage(currentPage - 1);
+      });
+
+      nextButton.addEventListener("click", async () => {
+        if (!pdfDoc) return;
+        const lastPage = chapterEnd > 0 ? Math.min(chapterEnd, pdfDoc.numPages) : pdfDoc.numPages;
+        if (currentPage >= lastPage) return;
+        scrollToPage(currentPage + 1);
+      });
+
+      zoomOutButton.addEventListener("click", async () => {
+        zoom = Math.max(0.8, Number((zoom - 0.1).toFixed(2)));
+        await renderPages();
+        scrollToPage(currentPage);
+      });
+
+      zoomInButton.addEventListener("click", async () => {
+        zoom = Math.min(2, Number((zoom + 0.1).toFixed(2)));
+        await renderPages();
+        scrollToPage(currentPage);
+      });
+
+      boot();
+    </script>
+  </body>
+</html>

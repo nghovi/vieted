@@ -5,6 +5,7 @@ import {
   getHistoryChapterByIdFromDb,
   getHistoryChapterEvaluation,
 } from "@/lib/db";
+import { ReviewSetList } from "./review-set-list";
 
 type Props = {
   params: Promise<{
@@ -140,40 +141,7 @@ export default async function HistoryReviewPage({ params }: Props) {
             <p className="eyebrow">Chi tiết theo bộ</p>
             <h2>Kết quả từng bộ kiểm tra.</h2>
           </div>
-          <div className="question-set">
-            {evaluation.setResults.map((setResult) => (
-              <article key={setResult.setId} className="feature-card">
-                <h3>{setResult.setTitle}</h3>
-                <p>Số lần làm: {setResult.attempts}</p>
-                <p>
-                  Điểm gần nhất:{" "}
-                  {setResult.latestScore !== null
-                    ? `${setResult.latestScore}%`
-                    : "Chưa làm"}
-                </p>
-                <p>
-                  Điểm cao nhất:{" "}
-                  {setResult.bestScore !== null
-                    ? `${setResult.bestScore}%`
-                    : "Chưa có"}
-                </p>
-                <p>
-                  Lần làm gần nhất:{" "}
-                  {setResult.lastSubmittedAt
-                    ? new Date(setResult.lastSubmittedAt).toLocaleString("vi-VN")
-                    : "Chưa có"}
-                </p>
-                <div className="inline-actions">
-                  <Link
-                    href={`/history/grade-9/${chapterId}/test/${setResult.setId}`}
-                    className="secondary-link"
-                  >
-                    Làm lại bộ này
-                  </Link>
-                </div>
-              </article>
-            ))}
-          </div>
+          <ReviewSetList chapterId={chapterId} setResults={evaluation.setResults} />
         </section>
       </section>
     </main>

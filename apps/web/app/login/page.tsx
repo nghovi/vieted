@@ -7,27 +7,32 @@ export default function LoginPage() {
       <section className="hero auth-hero">
         <div className="hero-copy">
           <p className="eyebrow">Đăng nhập học sinh</p>
-          <h1>Đăng nhập bằng số điện thoại và mật khẩu.</h1>
+          <h1>Đăng nhập bằng số điện thoại, TikTok, Facebook hoặc Gmail.</h1>
           <p className="lede">
-            Đây là bước xác thực đầu tiên cho web và mobile. Server xác thực
-            thông tin, tạo session, sau đó client điều hướng học sinh vào trải nghiệm học tập.
+            Trang này dành cho tài khoản đã đăng ký trước đó. Nếu học sinh chưa có tài
+            khoản, hãy sang trang đăng ký để tạo tài khoản bằng số điện thoại hoặc mạng xã hội.
           </p>
           <div className="demo-credentials">
-            <strong>Tài khoản demo</strong>
-            <span>Số điện thoại: 0987654321</span>
-            <span>Mật khẩu: vieted123</span>
+            <strong>Phương thức hỗ trợ</strong>
+            <span>Số điện thoại và mật khẩu.</span>
+            <span>Google/Gmail, Facebook, TikTok bằng mã tài khoản đã đăng ký.</span>
           </div>
         </div>
 
         <div className="hero-card auth-card">
-          <h2>Bắt đầu phiên học</h2>
+          <h2>Bắt đầu với VietEd</h2>
           <LoginForm />
           <p className="helper-copy">
-            Sau khi đăng nhập, trang chủ sẽ đọc session ở phía server để hiển thị thông tin học sinh.
+            Sau khi xác thực, trang chủ sẽ đọc session ở phía server để hiển thị thông tin học sinh.
           </p>
-          <Link href="/" className="secondary-link inline-link">
-            Quay lại trang chủ
-          </Link>
+          <div className="inline-actions">
+            <Link href="/privacy" className="secondary-link inline-link">
+              Chính sách quyền riêng tư
+            </Link>
+            <Link href="/" className="secondary-link inline-link">
+              Quay lại trang chủ
+            </Link>
+          </div>
         </div>
       </section>
     </main>

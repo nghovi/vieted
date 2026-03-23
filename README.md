@@ -90,7 +90,8 @@ See [docs/product-brief.md](/Users/nam/projects/vieted/docs/product-brief.md) fo
 
 Current stage target:
 
-- URL: `http://vieted.13.214.10.4.nip.io`
+- Preferred domain: `https://truongdiem.online`
+- Fallback stage URL: `http://vieted.13.214.10.4.nip.io`
 - app dir: `~/apps/vieted`
 
 Deployment scripts:

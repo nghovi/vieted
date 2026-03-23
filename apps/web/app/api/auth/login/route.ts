@@ -23,8 +23,8 @@ export async function POST(request: Request) {
   }
 
   const response = NextResponse.json({
+    isNewAccount: result.isNewAccount,
     student: result.student,
-    sessionToken: result.sessionToken,
   });
 
   response.cookies.set({

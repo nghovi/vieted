@@ -6,6 +6,7 @@ import {
   getHistoryChapterEvaluation,
   listHistoryQuestionSetsWithProgress,
 } from "@/lib/db";
+import { TestSetList } from "./test-set-list";
 
 type Props = {
   params: Promise<{
@@ -84,46 +85,7 @@ export default async function HistoryChapterTestPage({ params }: Props) {
           <h2>Chọn bộ câu hỏi để làm mới hoặc làm lại.</h2>
         </div>
 
-        <div className="question-set">
-          {testSets.map((set) => (
-            <article key={set.setId} className="feature-card">
-              <div className="test-toolbar">
-                <div>
-                  <h3>{set.setTitle}</h3>
-                  <p>{set.questionCount} câu trắc nghiệm</p>
-                </div>
-                <span className="test-progress-badge">{set.masteryLabel}</span>
-              </div>
-
-              <div className="test-stats">
-                <p>Số lần làm: {set.attempts}</p>
-                <p>
-                  Điểm gần nhất:{" "}
-                  {set.latestScore !== null ? `${set.latestScore}%` : "Chưa làm"}
-                </p>
-                <p>
-                  Điểm cao nhất:{" "}
-                  {set.bestScore !== null ? `${set.bestScore}%` : "Chưa có"}
-                </p>
-                <p>
-                  Lần làm gần nhất:{" "}
-                  {set.lastSubmittedAt
-                    ? new Date(set.lastSubmittedAt).toLocaleString("vi-VN")
-                    : "Chưa có"}
-                </p>
-              </div>
-
-              <div className="inline-actions">
-                <Link
-                  href={`/history/grade-9/${chapterId}/test/${set.setId}`}
-                  className="primary-link"
-                >
-                  {set.attempts > 0 ? "Làm lại" : "Làm bài"}
-                </Link>
-              </div>
-            </article>
-          ))}
-        </div>
+        <TestSetList chapterId={chapterId} sets={testSets} />
       </section>
     </main>
   );

@@ -2,18 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-
-const grades = Array.from({ length: 12 }, (_, index) => index + 1);
-const availableGrade = 9;
-
-const subjects = [
-  { value: "history", label: "Lịch sử", isAvailable: true },
-  { value: "math", label: "Toán", isAvailable: false },
-  { value: "english", label: "Tiếng Anh", isAvailable: false },
-  { value: "literature", label: "Ngữ văn", isAvailable: false },
-  { value: "physics", label: "Vật lý", isAvailable: false },
-  { value: "chemistry", label: "Hóa học", isAvailable: false },
-];
+import {
+  gradeOptions as grades,
+  subjectCatalog as subjects,
+  supportedGrade,
+} from "@/lib/study-catalog";
 
 type Props = {
   initialGrade: number;
@@ -65,14 +58,14 @@ export function StudyPreferencesForm({ initialGrade, initialSubject }: Props) {
           onChange={(event) => setCurrentGrade(event.target.value)}
         >
           {grades.map((grade) => (
-            <option key={grade} disabled={grade !== availableGrade} value={grade}>
-              {grade === availableGrade
+            <option key={grade} disabled={grade !== supportedGrade} value={grade}>
+              {grade === supportedGrade
                 ? `Lớp ${grade}`
                 : `Lớp ${grade} - Chưa khả dụng`}
             </option>
           ))}
         </select>
-        <span className="helper-copy">Hiện tại mới mở lớp 9 cho bản phát hành đầu tiên.</span>
+        <span className="helper-copy">Chọn lớp học phù hợp với hồ sơ học tập của em.</span>
       </label>
 
       <label className="field">
@@ -93,9 +86,7 @@ export function StudyPreferencesForm({ initialGrade, initialSubject }: Props) {
             </option>
           ))}
         </select>
-        <span className="helper-copy">
-          Giai đoạn này chỉ hỗ trợ môn Lịch sử để ra mắt nhanh và làm thật tốt.
-        </span>
+        <span className="helper-copy">Môn học đang học sẽ được lưu trong tài khoản của em.</span>
       </label>
 
       <button className="primary-link auth-submit" disabled={isSaving} type="submit">
