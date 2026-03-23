@@ -8,15 +8,15 @@ export async function POST(request: Request) {
   const body = (await request.json()) as {
     phoneNumber?: string;
     password?: string;
-    fullName?: string;
-    grade?: number;
+    confirmPassword?: string;
+    otpCode?: string;
   };
 
   const result = await validateStudentRegistration({
     phoneNumber: body.phoneNumber ?? "",
     password: body.password ?? "",
-    fullName: body.fullName,
-    grade: body.grade,
+    confirmPassword: body.confirmPassword ?? "",
+    otpCode: body.otpCode ?? "",
   });
 
   if (!result.ok) {

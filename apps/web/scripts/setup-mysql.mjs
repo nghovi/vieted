@@ -91,6 +91,18 @@ await connection.query(`
       on delete cascade
   );
 
+  create table if not exists student_phone_otps (
+    id bigint primary key auto_increment,
+    phone_number varchar(20) not null,
+    purpose varchar(40) not null,
+    code_hash char(64) not null,
+    expires_at datetime not null,
+    used_at datetime null,
+    created_at timestamp default current_timestamp,
+    index idx_student_phone_otps_lookup (phone_number, purpose, expires_at),
+    index idx_student_phone_otps_used_at (used_at)
+  );
+
   create table if not exists study_preferences (
     student_id bigint primary key,
     current_grade tinyint not null,

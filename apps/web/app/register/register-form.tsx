@@ -1,19 +1,73 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { SocialAuthForm } from "../auth/social-auth-form";
 
 export function RegisterForm() {
   const router = useRouter();
-  const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
-  const [grade, setGrade] = useState("9");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [otpCode, setOtpCode] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [otpMessage, setOtpMessage] = useState<string | null>(null);
+  const [otpPreview, setOtpPreview] = useState<string | null>(null);
+  const [otpCooldownSeconds, setOtpCooldownSeconds] = useState(0);
+
+  useEffect(() => {
+    if (otpCooldownSeconds <= 0) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setOtpCooldownSeconds((current) => current - 1);
+    }, 1000);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [otpCooldownSeconds]);
+
+  async function handleSendOtp() {
+    if (otpCooldownSeconds > 0) {
+      return;
+    }
+
+    setIsSendingOtp(true);
+    setErrorMessage(null);
+    setSuccessMessage(null);
+    setOtpMessage(null);
+
+    const response = await fetch("/api/auth/phone-otp/request", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        phoneNumber,
+        purpose: "register",
+      }),
+    });
+
+    const data = (await response.json()) as {
+      error?: string;
+      message?: string;
+      otpPreview?: string;
+    };
+
+    if (!response.ok) {
+      setErrorMessage(data.error ?? "Không thể gửi OTP.");
+      setIsSendingOtp(false);
+      return;
+    }
+
+    setOtpMessage(data.message ?? "OTP đã được gửi.");
+    setOtpPreview(data.otpPreview ?? null);
+    setOtpCooldownSeconds(60);
+    setIsSendingOtp(false);
+  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -27,10 +81,10 @@ export function RegisterForm() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        fullName,
         phoneNumber,
         password,
-        grade: Number(grade),
+        confirmPassword,
+        otpCode,
       }),
     });
 
@@ -52,17 +106,6 @@ export function RegisterForm() {
   return (
     <div className="auth-stack">
       <form className="auth-form" onSubmit={handleSubmit}>
-        <label className="field">
-          <span>Tên hiển thị</span>
-          <input
-            autoComplete="name"
-            name="fullName"
-            placeholder="Ví dụ: Nguyễn Nam"
-            value={fullName}
-            onChange={(event) => setFullName(event.target.value)}
-          />
-        </label>
-
         <label className="field">
           <span>Số điện thoại</span>
           <input
@@ -88,19 +131,53 @@ export function RegisterForm() {
         </label>
 
         <label className="field">
-          <span>Khối lớp</span>
-          <select
-            name="grade"
-            value={grade}
-            onChange={(event) => setGrade(event.target.value)}
-          >
-            {Array.from({ length: 12 }, (_, index) => index + 1).map((item) => (
-              <option key={item} value={item}>
-                Lớp {item}
-              </option>
-            ))}
-          </select>
+          <span>Xác nhận mật khẩu</span>
+          <input
+            autoComplete="new-password"
+            name="confirmPassword"
+            type="password"
+            placeholder="Nhập lại mật khẩu"
+            value={confirmPassword}
+            onChange={(event) => setConfirmPassword(event.target.value)}
+          />
         </label>
+
+        <div className="otp-panel">
+          <div className="otp-panel-header">
+            <div>
+              <strong>Xác nhận số điện thoại</strong>
+              <p className="helper-copy">Gửi OTP về số điện thoại rồi nhập mã 6 số để hoàn tất đăng ký.</p>
+            </div>
+            <button
+              className="otp-send-button"
+              type="button"
+              onClick={handleSendOtp}
+              disabled={isSendingOtp || otpCooldownSeconds > 0}
+            >
+              {isSendingOtp
+                ? "Đang gửi OTP..."
+                : otpCooldownSeconds > 0
+                  ? `Gửi lại sau ${otpCooldownSeconds}s`
+                  : "Gửi OTP"}
+            </button>
+          </div>
+
+          <label className="field">
+            <span>Mã OTP</span>
+            <input
+              inputMode="numeric"
+              name="otpCode"
+              placeholder="123456"
+              value={otpCode}
+              onChange={(event) => setOtpCode(event.target.value)}
+            />
+          </label>
+
+          {otpMessage ? <p className="form-success">{otpMessage}</p> : null}
+          {otpPreview ? (
+            <p className="helper-copy">Mã OTP thử nghiệm trên máy local: <strong>{otpPreview}</strong></p>
+          ) : null}
+        </div>
 
         {errorMessage ? <p className="form-error">{errorMessage}</p> : null}
         {successMessage ? <p className="form-success">{successMessage}</p> : null}
@@ -110,22 +187,8 @@ export function RegisterForm() {
         </button>
       </form>
 
-      <div className="auth-divider">
-        <span>hoặc</span>
-      </div>
-
-      <div className="social-auth-shell">
-        <div>
-          <h3>Đăng ký bằng TikTok, Facebook hoặc Gmail</h3>
-          <p className="helper-copy">
-            Trường Điểm Online sẽ lưu tài khoản mạng xã hội này làm phương thức đăng nhập cho học sinh.
-          </p>
-        </div>
-        <SocialAuthForm mode="register" />
-      </div>
-
       <p className="helper-copy">
-        Đã có tài khoản? <Link href="/login">Quay về đăng nhập</Link>
+        Đã có tài khoản? <Link href="/login" className="inline-text-link">đăng nhập</Link>
       </p>
     </div>
   );

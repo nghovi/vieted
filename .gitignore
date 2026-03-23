@@ -6,5 +6,7 @@ coverage
 
 apps/web/.next
 apps/web/node_modules
+apps/web/.env.local
+client_secret_*.json
 
 packages/*/node_modules

@@ -120,6 +120,10 @@ a {
   align-items: stretch;
 }
 
+.hero-guest {
+  grid-template-columns: minmax(0, 1.4fr) minmax(260px, 0.6fr);
+}
+
 .hero-copy,
 .hero-card,
 .feature-card,
@@ -216,6 +220,10 @@ a {
 .hero-card {
   padding: 28px;
   border-radius: 28px;
+}
+
+.hero-card-compact {
+  align-self: start;
 }
 
 .hero-card h2 {
@@ -356,10 +364,45 @@ a {
   gap: 12px;
 }
 
+.auth-inline-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .action-button {
   border: 0;
   cursor: pointer;
   font: inherit;
+}
+
+.text-action {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--highlight);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.inline-text-link {
+  color: var(--highlight);
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+  font-weight: 700;
+}
+
+.subtle-inline-link {
+  color: rgba(93, 111, 104, 0.72);
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 500;
+}
+
+.subtle-inline-link:hover {
+  color: rgba(93, 111, 104, 0.96);
+  text-decoration: underline;
+  text-underline-offset: 0.14em;
 }
 
 .field {
@@ -382,6 +425,11 @@ a {
   border-radius: 16px;
   font: inherit;
   color: var(--text);
+}
+
+.auth-form input::placeholder,
+.preferences-form input::placeholder {
+  color: rgba(93, 111, 104, 0.26);
 }
 
 .auth-divider {
@@ -413,6 +461,57 @@ a {
   cursor: pointer;
 }
 
+.auth-subpanel,
+.otp-panel {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: rgba(255, 250, 241, 0.62);
+}
+
+.otp-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.otp-panel-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.otp-send-button {
+  min-width: 148px;
+  min-height: 46px;
+  padding: 0 18px;
+  border: 1px solid rgba(22, 49, 39, 0.16);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #fffaf1 0%, #f4ead8 100%);
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(64, 44, 18, 0.08);
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    opacity 160ms ease;
+}
+
+.otp-send-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 24px rgba(64, 44, 18, 0.12);
+}
+
+.otp-send-button:disabled {
+  opacity: 0.68;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 .form-error {
   margin: 0;
   color: #b52e1f;
@@ -426,10 +525,112 @@ a {
 }
 
 .social-auth-form {
+  display: grid;
+  gap: 14px;
   padding: 18px;
-  border: 1px solid var(--line);
-  border-radius: 22px;
-  background: rgba(255, 250, 241, 0.56);
+  border: 1px solid rgba(12, 12, 18, 0.08);
+  border-radius: 24px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.82), rgba(249, 241, 231, 0.9)),
+    radial-gradient(circle at top left, rgba(37, 244, 238, 0.18), transparent 34%),
+    radial-gradient(circle at bottom right, rgba(254, 44, 85, 0.18), transparent 28%);
+  box-shadow: 0 18px 48px rgba(30, 19, 30, 0.08);
+}
+
+.social-provider-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.social-brand-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 58px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 18px;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    opacity 160ms ease;
+}
+
+.social-brand-button:hover {
+  transform: translateY(-1px);
+}
+
+.social-brand-button:disabled {
+  opacity: 0.72;
+  cursor: wait;
+}
+
+.social-brand-button-tiktok {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, #1a1a1a 0%, #090909 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+    0 18px 36px rgba(17, 17, 17, 0.22);
+}
+
+.social-brand-button-google {
+  border: 1px solid rgba(22, 49, 39, 0.12);
+  background: linear-gradient(180deg, #ffffff 0%, #f8f7f3 100%);
+  color: #163127;
+  box-shadow: 0 16px 30px rgba(70, 57, 40, 0.1);
+}
+
+.social-brand-button-facebook {
+  background: linear-gradient(180deg, #1877f2 0%, #1464cc 100%);
+  color: #ffffff;
+  box-shadow: 0 16px 30px rgba(24, 119, 242, 0.24);
+}
+
+.social-brand-button-tiktok::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(37, 244, 238, 0.18), transparent 26%),
+    linear-gradient(270deg, rgba(254, 44, 85, 0.18), transparent 24%);
+  pointer-events: none;
+}
+
+.social-brand-mark {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.social-brand-mark-light {
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: inset 0 0 0 1px rgba(22, 49, 39, 0.08);
+}
+
+.social-brand-mark-facebook {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.social-brand-icon {
+  position: relative;
+  z-index: 1;
+  width: 20px;
+  height: 20px;
 }
 
 .options-list {
@@ -873,6 +1074,7 @@ a {
 
 @media (max-width: 900px) {
   .hero,
+  .hero-guest,
   .grid {
     grid-template-columns: 1fr;
   }
@@ -933,4 +1135,5 @@ a {
   .avatar-option-grid {
     grid-template-columns: 1fr;
   }
+
 }

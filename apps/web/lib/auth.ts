@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import {
+  createStudentPhoneOtp,
   createStudentAccount,
   createStudentSession,
   deleteStudentSession,
@@ -7,12 +8,19 @@ import {
   findStudentByPhoneNumber,
   findStudentByProviderIdentity,
   findStudentBySessionToken,
+  findValidStudentPhoneOtp,
   getStudentAvatarPreset,
   getStudentStudyPreference,
+  markStudentPhoneOtpUsed,
+  updateStudentPassword,
   verifyPassword,
 } from "./db";
+import { isSmsDeliveryConfigured, sendOtpSms } from "./sms";
 
 const sessionCookieName = "vieted_session";
+const facebookOauthStateCookieName = "facebook_oauth_state";
+const googleOauthStateCookieName = "google_oauth_state";
+const tiktokOauthStateCookieName = "tiktok_oauth_state";
 
 export const defaultStudyPreference = {
   currentGrade: 9,
@@ -20,11 +28,17 @@ export const defaultStudyPreference = {
 } as const;
 
 export const socialAuthProviders = ["google", "facebook", "tiktok"] as const;
+export const phoneOtpPurposes = ["register", "reset-password"] as const;
 
 export type SocialAuthProvider = (typeof socialAuthProviders)[number];
+export type PhoneOtpPurpose = (typeof phoneOtpPurposes)[number];
 
 function isSocialAuthProvider(value: string): value is SocialAuthProvider {
   return socialAuthProviders.includes(value as SocialAuthProvider);
+}
+
+function isPhoneOtpPurpose(value: string): value is PhoneOtpPurpose {
+  return phoneOtpPurposes.includes(value as PhoneOtpPurpose);
 }
 
 function buildSessionStudent(student: Awaited<ReturnType<typeof findStudentBySessionToken>>) {
@@ -69,6 +83,10 @@ export function isValidEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizeEmail(value));
 }
 
+export function isValidPassword(value: string) {
+  return value.trim().length >= 8;
+}
+
 export function getAuthProviderLabel(provider: string) {
   switch (provider) {
     case "google":
@@ -82,6 +100,122 @@ export function getAuthProviderLabel(provider: string) {
   }
 }
 
+export function getTikTokOauthStateCookieName() {
+  return tiktokOauthStateCookieName;
+}
+
+export function getFacebookOauthStateCookieName() {
+  return facebookOauthStateCookieName;
+}
+
+export function getGoogleOauthStateCookieName() {
+  return googleOauthStateCookieName;
+}
+
+export function getFacebookAuthConfig() {
+  const appId = process.env.FACEBOOK_APP_ID?.trim() ?? "";
+  const appSecret = process.env.FACEBOOK_APP_SECRET?.trim() ?? "";
+  const redirectUri = process.env.FACEBOOK_REDIRECT_URI?.trim() ?? "";
+
+  if (!appId || !appSecret || !redirectUri) {
+    return null;
+  }
+
+  return {
+    appId,
+    appSecret,
+    redirectUri,
+  };
+}
+
+export function buildFacebookAuthorizeUrl(state: string) {
+  const config = getFacebookAuthConfig();
+
+  if (!config) {
+    return null;
+  }
+
+  const params = new URLSearchParams({
+    client_id: config.appId,
+    redirect_uri: config.redirectUri,
+    state,
+    scope: "public_profile,email",
+    response_type: "code",
+  });
+
+  return `https://www.facebook.com/v21.0/dialog/oauth?${params.toString()}`;
+}
+
+export function getGoogleAuthConfig() {
+  const clientId = process.env.GOOGLE_CLIENT_ID?.trim() ?? "";
+  const clientSecret = process.env.GOOGLE_CLIENT_SECRET?.trim() ?? "";
+  const redirectUri = process.env.GOOGLE_REDIRECT_URI?.trim() ?? "";
+
+  if (!clientId || !clientSecret || !redirectUri) {
+    return null;
+  }
+
+  return {
+    clientId,
+    clientSecret,
+    redirectUri,
+  };
+}
+
+export function buildGoogleAuthorizeUrl(state: string) {
+  const config = getGoogleAuthConfig();
+
+  if (!config) {
+    return null;
+  }
+
+  const params = new URLSearchParams({
+    client_id: config.clientId,
+    redirect_uri: config.redirectUri,
+    response_type: "code",
+    scope: "openid email profile",
+    state,
+    access_type: "offline",
+    prompt: "consent",
+  });
+
+  return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+}
+
+export function getTikTokAuthConfig() {
+  const clientKey = process.env.TIKTOK_CLIENT_KEY?.trim() ?? "";
+  const clientSecret = process.env.TIKTOK_CLIENT_SECRET?.trim() ?? "";
+  const redirectUri = process.env.TIKTOK_REDIRECT_URI?.trim() ?? "";
+
+  if (!clientKey || !clientSecret || !redirectUri) {
+    return null;
+  }
+
+  return {
+    clientKey,
+    clientSecret,
+    redirectUri,
+  };
+}
+
+export function buildTikTokAuthorizeUrl(state: string) {
+  const config = getTikTokAuthConfig();
+
+  if (!config) {
+    return null;
+  }
+
+  const params = new URLSearchParams({
+    client_key: config.clientKey,
+    redirect_uri: config.redirectUri,
+    response_type: "code",
+    scope: "user.info.basic",
+    state,
+  });
+
+  return `https://www.tiktok.com/v2/auth/authorize/?${params.toString()}`;
+}
+
 export async function validateStudentLogin(phoneNumber: string, password: string) {
   const normalizedPhone = normalizePhoneNumber(phoneNumber);
 
@@ -92,7 +226,7 @@ export async function validateStudentLogin(phoneNumber: string, password: string
     };
   }
 
-  if (password.trim().length < 8) {
+  if (!isValidPassword(password)) {
     return {
       ok: false as const,
       message: "Mật khẩu phải có ít nhất 8 ký tự.",
@@ -125,14 +259,85 @@ export async function validateStudentLogin(phoneNumber: string, password: string
   };
 }
 
+export async function requestPhoneOtp(input: {
+  phoneNumber: string;
+  purpose: string;
+}) {
+  const normalizedPhone = normalizePhoneNumber(input.phoneNumber);
+  const purpose = input.purpose.trim().toLowerCase();
+
+  if (!isValidPhoneNumber(normalizedPhone)) {
+    return {
+      ok: false as const,
+      message: "Số điện thoại không hợp lệ.",
+    };
+  }
+
+  if (!isPhoneOtpPurpose(purpose)) {
+    return {
+      ok: false as const,
+      message: "Yêu cầu OTP chưa được hỗ trợ.",
+    };
+  }
+
+  const existingStudent = await findStudentByPhoneNumber(normalizedPhone);
+
+  if (purpose === "register" && existingStudent) {
+    return {
+      ok: false as const,
+      message: "Số điện thoại này đã được đăng ký.",
+    };
+  }
+
+  if (
+    purpose === "reset-password" &&
+    (!existingStudent || existingStudent.authProvider !== "phone")
+  ) {
+    return {
+      ok: false as const,
+      message: "Không tìm thấy tài khoản số điện thoại này để đặt lại mật khẩu.",
+    };
+  }
+
+  const otpCode = String(Math.floor(100000 + Math.random() * 900000));
+  const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+
+  await createStudentPhoneOtp(normalizedPhone, purpose, otpCode, expiresAt);
+  let smsResult: Awaited<ReturnType<typeof sendOtpSms>>;
+
+  try {
+    smsResult = await sendOtpSms(normalizedPhone, otpCode, purpose);
+  } catch (error) {
+    console.error("Failed to send OTP SMS.", error);
+    return {
+      ok: false as const,
+      message: "Không thể gửi OTP qua SMS lúc này.",
+    };
+  }
+
+  return {
+    ok: true as const,
+    message: smsResult.delivered
+      ? "Mã OTP đã được gửi qua SMS."
+      : "Mã OTP đã được tạo cho số điện thoại này.",
+    expiresInSeconds: 5 * 60,
+    otpPreview:
+      !isSmsDeliveryConfigured() && process.env.NODE_ENV !== "production" ? otpCode : undefined,
+  };
+}
+
 export async function validateStudentRegistration(input: {
   phoneNumber: string;
   password: string;
+  confirmPassword: string;
+  otpCode: string;
   fullName?: string;
   grade?: number;
 }) {
   const normalizedPhone = normalizePhoneNumber(input.phoneNumber);
   const password = input.password ?? "";
+  const confirmPassword = input.confirmPassword ?? "";
+  const otpCode = input.otpCode.trim();
   const fullName = input.fullName?.trim() ?? "";
   const grade = Number(input.grade ?? defaultStudyPreference.currentGrade);
 
@@ -143,10 +348,24 @@ export async function validateStudentRegistration(input: {
     };
   }
 
-  if (password.trim().length < 8) {
+  if (!isValidPassword(password)) {
     return {
       ok: false as const,
       message: "Mật khẩu phải có ít nhất 8 ký tự.",
+    };
+  }
+
+  if (password !== confirmPassword) {
+    return {
+      ok: false as const,
+      message: "Mật khẩu xác nhận chưa khớp.",
+    };
+  }
+
+  if (!/^\d{6}$/.test(otpCode)) {
+    return {
+      ok: false as const,
+      message: "Mã OTP cần gồm 6 chữ số.",
     };
   }
 
@@ -173,6 +392,15 @@ export async function validateStudentRegistration(input: {
     };
   }
 
+  const otpRecord = await findValidStudentPhoneOtp(normalizedPhone, "register", otpCode);
+
+  if (!otpRecord) {
+    return {
+      ok: false as const,
+      message: "Mã OTP không đúng hoặc đã hết hạn.",
+    };
+  }
+
   const student = await createStudentAccount({
     phoneNumber: normalizedPhone,
     password,
@@ -181,6 +409,8 @@ export async function validateStudentRegistration(input: {
     authProvider: "phone",
   });
 
+  await markStudentPhoneOtpUsed(otpRecord.id);
+
   const sessionToken = await createStudentSession(student.id);
 
   return {
@@ -188,6 +418,76 @@ export async function validateStudentRegistration(input: {
     isNewAccount: true,
     student: buildSessionStudent(student),
     sessionToken,
+  };
+}
+
+export async function resetStudentPasswordWithOtp(input: {
+  phoneNumber: string;
+  otpCode: string;
+  password: string;
+  confirmPassword: string;
+}) {
+  const normalizedPhone = normalizePhoneNumber(input.phoneNumber);
+  const otpCode = input.otpCode.trim();
+  const password = input.password ?? "";
+  const confirmPassword = input.confirmPassword ?? "";
+
+  if (!isValidPhoneNumber(normalizedPhone)) {
+    return {
+      ok: false as const,
+      message: "Số điện thoại không hợp lệ.",
+    };
+  }
+
+  if (!/^\d{6}$/.test(otpCode)) {
+    return {
+      ok: false as const,
+      message: "Mã OTP cần gồm 6 chữ số.",
+    };
+  }
+
+  if (!isValidPassword(password)) {
+    return {
+      ok: false as const,
+      message: "Mật khẩu mới phải có ít nhất 8 ký tự.",
+    };
+  }
+
+  if (password !== confirmPassword) {
+    return {
+      ok: false as const,
+      message: "Mật khẩu xác nhận chưa khớp.",
+    };
+  }
+
+  const student = await findStudentByPhoneNumber(normalizedPhone);
+
+  if (!student || student.authProvider !== "phone") {
+    return {
+      ok: false as const,
+      message: "Không tìm thấy tài khoản số điện thoại này.",
+    };
+  }
+
+  const otpRecord = await findValidStudentPhoneOtp(
+    normalizedPhone,
+    "reset-password",
+    otpCode,
+  );
+
+  if (!otpRecord) {
+    return {
+      ok: false as const,
+      message: "Mã OTP không đúng hoặc đã hết hạn.",
+    };
+  }
+
+  await updateStudentPassword(student.id, password);
+  await markStudentPhoneOtpUsed(otpRecord.id);
+
+  return {
+    ok: true as const,
+    message: "Đặt lại mật khẩu thành công. Bạn có thể đăng nhập lại ngay.",
   };
 }
 
@@ -292,6 +592,120 @@ export async function validateSocialAuth(input: {
     fullName,
     grade,
     authProvider: provider,
+    authProviderUserId: providerUserId,
+  });
+
+  const sessionToken = await createStudentSession(student.id);
+
+  return {
+    ok: true as const,
+    isNewAccount: true,
+    student: buildSessionStudent(student),
+    sessionToken,
+  };
+}
+
+export async function signInWithTikTokIdentity(input: {
+  openId: string;
+  displayName?: string;
+}) {
+  return signInWithOauthIdentity({
+    provider: "tiktok",
+    providerUserId: input.openId,
+    fullName: input.displayName,
+  });
+}
+
+export async function signInWithGoogleIdentity(input: {
+  googleUserId: string;
+  email: string;
+  fullName?: string;
+}) {
+  return signInWithOauthIdentity({
+    provider: "google",
+    providerUserId: input.googleUserId,
+    email: input.email,
+    fullName: input.fullName,
+  });
+}
+
+export async function signInWithFacebookIdentity(input: {
+  facebookUserId: string;
+  email?: string;
+  fullName?: string;
+}) {
+  return signInWithOauthIdentity({
+    provider: "facebook",
+    providerUserId: input.facebookUserId,
+    email: input.email,
+    fullName: input.fullName,
+  });
+}
+
+async function signInWithOauthIdentity(input: {
+  provider: SocialAuthProvider;
+  providerUserId: string;
+  email?: string;
+  fullName?: string;
+}) {
+  const providerUserId = input.providerUserId.trim();
+  const email = input.email ? normalizeEmail(input.email) : "";
+  const fullName = input.fullName?.trim() ?? "";
+
+  if (providerUserId.length < 3) {
+    return {
+      ok: false as const,
+      message: `Không thể xác định tài khoản ${getAuthProviderLabel(input.provider)}.`,
+    };
+  }
+
+  if (input.provider === "google" && !isValidEmail(email)) {
+    return {
+      ok: false as const,
+      message: "Google không trả về email hợp lệ.",
+    };
+  }
+
+  const existingStudent = await findStudentByProviderIdentity(input.provider, providerUserId);
+
+  if (existingStudent) {
+    const sessionToken = await createStudentSession(existingStudent.id);
+
+    return {
+      ok: true as const,
+      isNewAccount: false,
+      student: buildSessionStudent(existingStudent),
+      sessionToken,
+    };
+  }
+
+  if (email) {
+    const existingByEmail = await findStudentByEmail(email);
+
+    if (existingByEmail) {
+      if (existingByEmail.authProvider === input.provider) {
+        const sessionToken = await createStudentSession(existingByEmail.id);
+
+        return {
+          ok: true as const,
+          isNewAccount: false,
+          student: buildSessionStudent(existingByEmail),
+          sessionToken,
+        };
+      }
+
+      return {
+        ok: false as const,
+        message: `Email này đang thuộc về tài khoản ${getAuthProviderLabel(existingByEmail.authProvider)} khác.`,
+      };
+    }
+  }
+
+  const student = await createStudentAccount({
+    email: email || undefined,
+    fullName: fullName || undefined,
+    grade: defaultStudyPreference.currentGrade,
+    authProvider: input.provider,
     authProviderUserId: providerUserId,
   });
 

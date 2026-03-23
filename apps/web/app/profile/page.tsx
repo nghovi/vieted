@@ -41,9 +41,6 @@ export default async function ProfilePage() {
           </div>
           <div className="hero-actions">
             <LogoutButton />
-            <Link href="/roadmap" className="secondary-link">
-              Lộ trình sản phẩm
-            </Link>
             <Link href="/privacy" className="secondary-link">
               Xem chính sách
             </Link>

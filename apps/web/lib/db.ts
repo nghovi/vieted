@@ -39,6 +39,15 @@ export type DbStudyPreference = {
   currentEnglishChapterId: string;
 };
 
+export type DbStudentPhoneOtp = {
+  id: number;
+  phoneNumber: string;
+  purpose: string;
+  codeHash: string;
+  expiresAt: Date;
+  usedAt: Date | null;
+};
+
 export type HistoryLearnStatus = "not_started" | "learning" | "completed";
 
 export type HistoryEvaluationOverview = {
@@ -242,6 +251,10 @@ function createPasswordHash(password: string) {
   const salt = crypto.randomBytes(16).toString("hex");
   const derivedKey = crypto.scryptSync(password, salt, 64).toString("hex");
   return `scrypt:${salt}:${derivedKey}`;
+}
+
+function createOtpHash(code: string) {
+  return crypto.createHash("sha256").update(code).digest("hex");
 }
 
 function toIsoOrNull(value: Date | null) {
@@ -488,6 +501,59 @@ export async function createStudentSession(studentId: number) {
   );
 
   return sessionToken;
+}
+
+export async function createStudentPhoneOtp(
+  phoneNumber: string,
+  purpose: string,
+  code: string,
+  expiresAt: Date,
+) {
+  await pool.query(
+    `delete from student_phone_otps
+     where phone_number = ?
+       and purpose = ?`,
+    [phoneNumber, purpose],
+  );
+
+  await pool.query(
+    `insert into student_phone_otps (
+       phone_number, purpose, code_hash, expires_at
+     )
+     values (?, ?, ?, ?)`,
+    [phoneNumber, purpose, createOtpHash(code), expiresAt],
+  );
+}
+
+export async function findValidStudentPhoneOtp(
+  phoneNumber: string,
+  purpose: string,
+  code: string,
+) {
+  const [rows] = await pool.query(
+    `select id, phone_number as phoneNumber, purpose, code_hash as codeHash,
+            expires_at as expiresAt, used_at as usedAt
+     from student_phone_otps
+     where phone_number = ?
+       and purpose = ?
+       and code_hash = ?
+       and used_at is null
+       and expires_at > utc_timestamp()
+     order by id desc
+     limit 1`,
+    [phoneNumber, purpose, createOtpHash(code)],
+  );
+
+  return (rows as DbStudentPhoneOtp[])[0] ?? null;
+}
+
+export async function markStudentPhoneOtpUsed(otpId: number) {
+  await pool.query(
+    `update student_phone_otps
+     set used_at = utc_timestamp()
+     where id = ?`,
+    [otpId],
+  );
 }
 
 export async function createStudentAccount(
