@@ -306,15 +306,20 @@ export async function validateSocialAuth(input: {
 }
 
 export async function getServerSessionStudent() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(sessionCookieName)?.value;
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get(sessionCookieName)?.value;
 
-  if (!token) {
+    if (!token) {
+      return null;
+    }
+
+    const student = await findStudentBySessionToken(token);
+    return buildSessionStudent(student);
+  } catch (error) {
+    console.error("Failed to load server session student.", error);
     return null;
   }
-
-  const student = await findStudentBySessionToken(token);
-  return buildSessionStudent(student);
 }
 
 export function getSessionCookieName() {
@@ -333,9 +338,32 @@ export async function logoutServerSession() {
 }
 
 export async function getServerStudyPreference() {
-  const student = await getServerSessionStudent();
+  try {
+    const student = await getServerSessionStudent();
 
-  if (!student) {
+    if (!student) {
+      return {
+        ...defaultStudyPreference,
+        currentHistoryChapterId: "chuong-1-the-gioi-1918-1945",
+        currentGeographyChapterId: "chuong-1-dia-li-dan-cu-viet-nam",
+        currentEnglishChapterId: "unit-1-local-community",
+      };
+    }
+
+    const preference = await getStudentStudyPreference(student.dbId);
+
+    if (!preference) {
+      return {
+        ...defaultStudyPreference,
+        currentHistoryChapterId: "chuong-1-the-gioi-1918-1945",
+        currentGeographyChapterId: "chuong-1-dia-li-dan-cu-viet-nam",
+        currentEnglishChapterId: "unit-1-local-community",
+      };
+    }
+
+    return preference;
+  } catch (error) {
+    console.error("Failed to load study preference.", error);
     return {
       ...defaultStudyPreference,
       currentHistoryChapterId: "chuong-1-the-gioi-1918-1945",
@@ -343,19 +371,6 @@ export async function getServerStudyPreference() {
       currentEnglishChapterId: "unit-1-local-community",
     };
   }
-
-  const preference = await getStudentStudyPreference(student.dbId);
-
-  if (!preference) {
-    return {
-      ...defaultStudyPreference,
-      currentHistoryChapterId: "chuong-1-the-gioi-1918-1945",
-      currentGeographyChapterId: "chuong-1-dia-li-dan-cu-viet-nam",
-      currentEnglishChapterId: "unit-1-local-community",
-    };
-  }
-
-  return preference;
 }
 
 export async function getServerSelectedHistoryChapter() {

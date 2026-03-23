@@ -17,6 +17,9 @@ import {
   getHistoryEvaluationOverview,
   listHistoryChaptersFromDb,
 } from "@/lib/db";
+import { grade9EnglishChapters } from "@/lib/english-grade-9";
+import { grade9GeographyChapters } from "@/lib/geography-grade-9";
+import { grade9HistoryChapters } from "@/lib/history-grade-9";
 import { EnglishChapterForm } from "./english-chapter-form";
 import { GeographyChapterForm } from "./geography-chapter-form";
 import { HistoryChapterForm } from "./history-chapter-form";
@@ -62,32 +65,67 @@ export default async function HomePage() {
   const selectedHistoryChapterId = await getServerSelectedHistoryChapter();
   const selectedGeographyChapterId = await getServerSelectedGeographyChapter();
   const selectedEnglishChapterId = await getServerSelectedEnglishChapter();
-  const chapters = await listHistoryChaptersFromDb();
-  const geographyChapters = await listGeographyChaptersFromDb();
-  const englishChapters = await listEnglishChaptersFromDb();
-  const selectedHistoryChapter =
-    (await getHistoryChapterByIdFromDb(selectedHistoryChapterId)) ??
-    (chapters[0]
-      ? await getHistoryChapterByIdFromDb(chapters[0].id)
-      : null);
-  const selectedGeographyChapter =
-    (await getGeographyChapterByIdFromDb(selectedGeographyChapterId)) ??
-    (geographyChapters[0]
-      ? await getGeographyChapterByIdFromDb(geographyChapters[0].id)
-      : null);
-  const selectedEnglishChapter =
-    (await getEnglishChapterByIdFromDb(selectedEnglishChapterId)) ??
-    (englishChapters[0]
-      ? await getEnglishChapterByIdFromDb(englishChapters[0].id)
-      : null);
+  let chapterChoices = grade9HistoryChapters.map((chapter) => ({
+    id: chapter.id,
+    title: chapter.title,
+  }));
+  let geographyChapterChoices = grade9GeographyChapters.map((chapter) => ({
+    id: chapter.id,
+    title: chapter.title,
+  }));
+  let englishChapterChoices = grade9EnglishChapters.map((chapter) => ({
+    id: chapter.id,
+    title: chapter.title,
+  }));
+  let selectedHistoryChapter =
+    grade9HistoryChapters.find((chapter) => chapter.id === selectedHistoryChapterId) ??
+    grade9HistoryChapters[0] ??
+    null;
+  let selectedGeographyChapter =
+    grade9GeographyChapters.find((chapter) => chapter.id === selectedGeographyChapterId) ??
+    grade9GeographyChapters[0] ??
+    null;
+  let selectedEnglishChapter =
+    grade9EnglishChapters.find((chapter) => chapter.id === selectedEnglishChapterId) ??
+    grade9EnglishChapters[0] ??
+    null;
   const subjectLabel =
     subjectLabels[preference.currentSubject] ?? preference.currentSubject;
-  const historyEvaluation =
-    student ? await getHistoryEvaluationOverview(student.dbId) : null;
-  const geographyEvaluation =
-    student ? await getGeographyEvaluationOverview(student.dbId) : null;
-  const englishEvaluation =
-    student ? await getEnglishEvaluationOverview(student.dbId) : null;
+  let historyEvaluation = null;
+  let geographyEvaluation = null;
+  let englishEvaluation = null;
+
+  try {
+    chapterChoices = (await listHistoryChaptersFromDb()).map((chapter) => ({
+      id: chapter.id,
+      title: chapter.title,
+    }));
+    geographyChapterChoices = (await listGeographyChaptersFromDb()).map((chapter) => ({
+      id: chapter.id,
+      title: chapter.title,
+    }));
+    englishChapterChoices = (await listEnglishChaptersFromDb()).map((chapter) => ({
+      id: chapter.id,
+      title: chapter.title,
+    }));
+    selectedHistoryChapter =
+      (await getHistoryChapterByIdFromDb(selectedHistoryChapterId)) ??
+      selectedHistoryChapter ??
+      null;
+    selectedGeographyChapter =
+      (await getGeographyChapterByIdFromDb(selectedGeographyChapterId)) ??
+      selectedGeographyChapter ??
+      null;
+    selectedEnglishChapter =
+      (await getEnglishChapterByIdFromDb(selectedEnglishChapterId)) ??
+      selectedEnglishChapter ??
+      null;
+    historyEvaluation = student ? await getHistoryEvaluationOverview(student.dbId) : null;
+    geographyEvaluation = student ? await getGeographyEvaluationOverview(student.dbId) : null;
+    englishEvaluation = student ? await getEnglishEvaluationOverview(student.dbId) : null;
+  } catch (error) {
+    console.error("Falling back to bundled homepage content because DB is unavailable.", error);
+  }
   const selectedChapter =
     preference.currentSubject === "history"
       ? selectedHistoryChapter
@@ -96,10 +134,10 @@ export default async function HomePage() {
         : selectedEnglishChapter;
   const selectedChapters =
     preference.currentSubject === "history"
-      ? chapters
+      ? chapterChoices
       : preference.currentSubject === "geography"
-        ? geographyChapters
-        : englishChapters;
+        ? geographyChapterChoices
+        : englishChapterChoices;
   const selectedEvaluation =
     preference.currentSubject === "history"
       ? historyEvaluation
