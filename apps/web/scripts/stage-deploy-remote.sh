@@ -3,6 +3,8 @@ set -euo pipefail
 
 APP_DIR="/home/centos/apps/vieted"
 FALLBACK_ENV="$HOME/ch_data_fetcher/.env"
+ENV_FILE="$APP_DIR/apps/web/.env.production"
+ENV_BACKUP=""
 NODE_BIN="$HOME/local/node-v18.18.0-linux-x64-glibc-217/bin/node"
 NPM_CLI="$HOME/local/node-v18.18.0-linux-x64-glibc-217/lib/node_modules/npm/bin/npm-cli.js"
 REPO_URL="git@github.com:nghovi/vieted.git"
@@ -24,6 +26,11 @@ done
 
 mkdir -p "$APP_DIR"
 cd "$APP_DIR"
+
+if [[ -f "$ENV_FILE" ]]; then
+  ENV_BACKUP="$(mktemp)"
+  cp "$ENV_FILE" "$ENV_BACKUP"
+fi
 
 if [[ ! -d "$APP_DIR/.git" ]]; then
   find "$APP_DIR" -mindepth 1 -maxdepth 1 ! -name 'vieted.log' -exec rm -rf {} +
@@ -50,8 +57,14 @@ fi
 chmod +x "$APP_DIR/apps/web/scripts/stage-run.sh"
 chmod +x "$APP_DIR/apps/web/scripts/install-stage-cert.sh"
 
-if [[ ! -f "$APP_DIR/apps/web/.env.production" ]]; then
-  cat > "$APP_DIR/apps/web/.env.production" <<'EOF'
+if [[ -n "$ENV_BACKUP" && -f "$ENV_BACKUP" ]]; then
+  mkdir -p "$(dirname "$ENV_FILE")"
+  cp "$ENV_BACKUP" "$ENV_FILE"
+  rm -f "$ENV_BACKUP"
+fi
+
+if [[ ! -f "$ENV_FILE" ]]; then
+  cat > "$ENV_FILE" <<'EOF'
 DB_HOST=cfd.c7hvdub23zsh.ap-southeast-1.rds.amazonaws.com
 DB_PORT=3306
 DB_DATABASE=vieted
@@ -59,10 +72,10 @@ DB_USERNAME=admin
 EOF
 fi
 
-if [[ -f "$APP_DIR/apps/web/.env.production" ]]; then
+if [[ -f "$ENV_FILE" ]]; then
   set -a
   # Load persisted stage env values such as DB_PASSWORD before exporting defaults.
-  source "$APP_DIR/apps/web/.env.production"
+  source "$ENV_FILE"
   set +a
 fi
 
@@ -84,10 +97,10 @@ if [[ -z "$DB_PASSWORD" ]]; then
   exit 1
 fi
 
-if grep -q '^DB_PASSWORD=' "$APP_DIR/apps/web/.env.production"; then
-  perl -0pi -e "s/^DB_PASSWORD=.*$/DB_PASSWORD=$ENV{DB_PASSWORD}/m" "$APP_DIR/apps/web/.env.production"
+if grep -q '^DB_PASSWORD=' "$ENV_FILE"; then
+  perl -0pi -e "s/^DB_PASSWORD=.*$/DB_PASSWORD=$ENV{DB_PASSWORD}/m" "$ENV_FILE"
 else
-  printf '\nDB_PASSWORD=%s\n' "$DB_PASSWORD" >> "$APP_DIR/apps/web/.env.production"
+  printf '\nDB_PASSWORD=%s\n' "$DB_PASSWORD" >> "$ENV_FILE"
 fi
 
 "$NODE_BIN" "$NPM_CLI" install
