@@ -11,6 +11,11 @@ export DB_DATABASE="${DB_DATABASE:-vieted}"
 export DB_USERNAME="${DB_USERNAME:-admin}"
 export DB_PASSWORD="${DB_PASSWORD:-}"
 
+if [[ -z "$DB_PASSWORD" ]]; then
+  echo "DB_PASSWORD is missing in /home/centos/apps/vieted/apps/web/.env.production"
+  exit 1
+fi
+
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 cd "$ROOT_DIR"
 

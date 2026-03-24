@@ -55,7 +55,6 @@ DB_HOST=cfd.c7hvdub23zsh.ap-southeast-1.rds.amazonaws.com
 DB_PORT=3306
 DB_DATABASE=vieted
 DB_USERNAME=admin
-DB_PASSWORD=
 EOF
 fi
 
@@ -72,6 +71,11 @@ export DB_PORT="${DB_PORT:-3306}"
 export DB_DATABASE="${DB_DATABASE:-vieted}"
 export DB_USERNAME="${DB_USERNAME:-admin}"
 export DB_PASSWORD="${DB_PASSWORD:-}"
+
+if [[ -z "$DB_PASSWORD" ]]; then
+  echo "DB_PASSWORD is missing in $APP_DIR/apps/web/.env.production"
+  exit 1
+fi
 
 "$NODE_BIN" "$NPM_CLI" install
 "$NODE_BIN" "$NPM_CLI" run db:setup --workspace web
