@@ -98,7 +98,21 @@ if [[ -z "$DB_PASSWORD" ]]; then
 fi
 
 if grep -q '^DB_PASSWORD=' "$ENV_FILE"; then
-  perl -0pi -e "s/^DB_PASSWORD=.*$/DB_PASSWORD=$ENV{DB_PASSWORD}/m" "$ENV_FILE"
+  python3 - "$ENV_FILE" "$DB_PASSWORD" <<'PY'
+from pathlib import Path
+import sys
+
+env_path = Path(sys.argv[1])
+db_password = sys.argv[2]
+lines = env_path.read_text().splitlines()
+updated = []
+for line in lines:
+    if line.startswith("DB_PASSWORD="):
+        updated.append(f"DB_PASSWORD={db_password}")
+    else:
+        updated.append(line)
+env_path.write_text("\n".join(updated) + "\n")
+PY
 else
   printf '\nDB_PASSWORD=%s\n' "$DB_PASSWORD" >> "$ENV_FILE"
 fi
