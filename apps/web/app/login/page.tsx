@@ -13,14 +13,6 @@ export default function LoginPage() {
             Trang này dành cho tài khoản đã đăng ký trước đó. Nếu học sinh chưa có tài
             khoản, hãy sang trang <Link href="/register" className="inline-text-link">đăng ký</Link> để tạo tài khoản bằng số điện thoại.
           </p>
-          <div className="demo-credentials">
-            <strong>Phương thức hỗ trợ</strong>
-            <span>Số điện thoại và mật khẩu.</span>
-            <span>Quên mật khẩu có thể đặt lại bằng OTP gửi theo số điện thoại.</span>
-            <span>Gmail bằng đăng nhập trực tiếp qua Google.</span>
-            <span>Facebook bằng đăng nhập trực tiếp qua Meta.</span>
-            <span>TikTok bằng đăng nhập trực tiếp trên trang xác thực của TikTok.</span>
-          </div>
         </div>
 
         <div className="hero-card auth-card">

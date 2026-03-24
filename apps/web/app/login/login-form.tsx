@@ -323,12 +323,6 @@ export function LoginForm() {
       </div>
 
       <div className="social-auth-shell">
-        <div>
-          <h3>Đăng nhập nhanh với Gmail, Facebook hoặc TikTok</h3>
-          <p className="helper-copy">
-            Không cần nhập username hay email liên kết. Chỉ cần bấm nút đăng nhập để xác thực.
-          </p>
-        </div>
         {socialErrorMessage ? <p className="form-error">{socialErrorMessage}</p> : null}
         <SocialAuthForm />
       </div>

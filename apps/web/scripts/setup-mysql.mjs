@@ -110,6 +110,7 @@ await connection.query(`
     current_history_chapter_id varchar(120) not null,
     current_geography_chapter_id varchar(120) not null default 'chuong-1-dia-li-dan-cu-viet-nam',
     current_english_chapter_id varchar(120) not null default 'unit-1-local-community',
+    current_math_chapter_id varchar(120) not null default 'chuong-1-can-bac-hai-va-can-thuc',
     created_at timestamp default current_timestamp,
     updated_at timestamp default current_timestamp on update current_timestamp,
     constraint fk_study_preferences_student_id
@@ -403,6 +404,98 @@ await connection.query(`
       foreign key (question_id) references english_questions(id)
       on delete cascade
   );
+
+  create table if not exists math_chapters (
+    id varchar(120) primary key,
+    title varchar(255) not null,
+    summary text not null,
+    textbook_scope varchar(255) not null,
+    learn_overview text not null,
+    learn_key_ideas_json json not null,
+    review_checklist_json json not null,
+    review_quick_prompts_json json not null,
+    sort_order int not null
+  );
+
+  create table if not exists math_question_sets (
+    id varchar(120) primary key,
+    chapter_id varchar(120) not null,
+    title varchar(255) not null,
+    sort_order int not null,
+    constraint fk_math_question_sets_chapter_id
+      foreign key (chapter_id) references math_chapters(id)
+      on delete cascade
+  );
+
+  create table if not exists math_questions (
+    id varchar(120) primary key,
+    question_set_id varchar(120) not null,
+    prompt text not null,
+    options_json json not null,
+    correct_option tinyint not null,
+    explanation text not null,
+    sort_order int not null,
+    constraint fk_math_questions_set_id
+      foreign key (question_set_id) references math_question_sets(id)
+      on delete cascade
+  );
+
+  create table if not exists student_math_chapter_progress (
+    student_id bigint not null,
+    chapter_id varchar(120) not null,
+    learn_status varchar(20) not null,
+    learn_completed_at datetime null,
+    last_activity_at datetime null,
+    created_at timestamp default current_timestamp,
+    updated_at timestamp default current_timestamp on update current_timestamp,
+    primary key (student_id, chapter_id),
+    constraint fk_student_math_chapter_progress_student_id
+      foreign key (student_id) references students(id)
+      on delete cascade
+  );
+
+  create table if not exists student_math_set_attempts (
+    id bigint primary key auto_increment,
+    student_id bigint not null,
+    chapter_id varchar(120) not null,
+    question_set_id varchar(120) not null,
+    score_percent decimal(5,2) not null,
+    correct_count int not null,
+    total_questions int not null,
+    submitted_at datetime not null,
+    created_at timestamp default current_timestamp,
+    index idx_student_math_set_attempts_student_id (student_id),
+    index idx_student_math_set_attempts_chapter_id (chapter_id),
+    constraint fk_student_math_set_attempts_student_id
+      foreign key (student_id) references students(id)
+      on delete cascade,
+    constraint fk_student_math_set_attempts_set_id
+      foreign key (question_set_id) references math_question_sets(id)
+      on delete cascade
+  );
+
+  create table if not exists student_math_question_attempts (
+    id bigint primary key auto_increment,
+    set_attempt_id bigint not null,
+    student_id bigint not null,
+    chapter_id varchar(120) not null,
+    question_set_id varchar(120) not null,
+    question_id varchar(120) not null,
+    selected_option tinyint not null,
+    is_correct tinyint(1) not null,
+    created_at datetime not null,
+    index idx_student_math_question_attempts_attempt_id (set_attempt_id),
+    index idx_student_math_question_attempts_student_id (student_id),
+    constraint fk_student_math_question_attempts_attempt_id
+      foreign key (set_attempt_id) references student_math_set_attempts(id)
+      on delete cascade,
+    constraint fk_student_math_question_attempts_student_id
+      foreign key (student_id) references students(id)
+      on delete cascade,
+    constraint fk_student_math_question_attempts_question_id
+      foreign key (question_id) references math_questions(id)
+      on delete cascade
+  );
 `);
 
 const [studentAvatarColumnRows] = await connection.query(
@@ -543,6 +636,27 @@ if (!hasStudyPreferencesEnglishColumn) {
     add column current_english_chapter_id varchar(120) not null
       default 'unit-1-local-community'
     after current_geography_chapter_id
+  `);
+}
+
+const [studyPreferencesMathColumnRows] = await connection.query(
+  `select count(*) as total
+   from information_schema.columns
+   where table_schema = ?
+     and table_name = 'study_preferences'
+     and column_name = 'current_math_chapter_id'`,
+  [config.database],
+);
+
+const hasStudyPreferencesMathColumn =
+  Number(studyPreferencesMathColumnRows[0]?.total ?? 0) > 0;
+
+if (!hasStudyPreferencesMathColumn) {
+  await connection.query(`
+    alter table study_preferences
+    add column current_math_chapter_id varchar(120) not null
+      default 'chuong-1-can-bac-hai-va-can-thuc'
+    after current_english_chapter_id
   `);
 }
 

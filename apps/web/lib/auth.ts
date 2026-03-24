@@ -762,6 +762,7 @@ export async function getServerStudyPreference() {
         currentHistoryChapterId: "chuong-1-the-gioi-1918-1945",
         currentGeographyChapterId: "chuong-1-dia-li-dan-cu-viet-nam",
         currentEnglishChapterId: "unit-1-local-community",
+        currentMathChapterId: "chuong-1-can-bac-hai-va-can-thuc",
       };
     }
 
@@ -773,6 +774,7 @@ export async function getServerStudyPreference() {
         currentHistoryChapterId: "chuong-1-the-gioi-1918-1945",
         currentGeographyChapterId: "chuong-1-dia-li-dan-cu-viet-nam",
         currentEnglishChapterId: "unit-1-local-community",
+        currentMathChapterId: "chuong-1-can-bac-hai-va-can-thuc",
       };
     }
 
@@ -797,6 +799,7 @@ export async function getServerStudyPreference() {
       currentHistoryChapterId: "chuong-1-the-gioi-1918-1945",
       currentGeographyChapterId: "chuong-1-dia-li-dan-cu-viet-nam",
       currentEnglishChapterId: "unit-1-local-community",
+      currentMathChapterId: "chuong-1-can-bac-hai-va-can-thuc",
     };
   }
 }
@@ -814,4 +817,9 @@ export async function getServerSelectedGeographyChapter() {
 export async function getServerSelectedEnglishChapter() {
   const preference = await getServerStudyPreference();
   return preference.currentEnglishChapterId ?? "unit-1-local-community";
+}
+
+export async function getServerSelectedMathChapter() {
+  const preference = await getServerStudyPreference();
+  return preference.currentMathChapterId ?? "chuong-1-can-bac-hai-va-can-thuc";
 }

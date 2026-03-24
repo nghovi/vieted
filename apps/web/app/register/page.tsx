@@ -12,11 +12,6 @@ export default function RegisterPage() {
             Trang đăng ký dành cho học sinh tạo tài khoản mới bằng số điện thoại.
             Số điện thoại sẽ được xác nhận bằng OTP trước khi tài khoản mới được tạo.
           </p>
-          <div className="demo-credentials">
-            <strong>Cách đăng ký hiện có</strong>
-            <span>Số điện thoại, OTP xác nhận, và mật khẩu.</span>
-            <span>TikTok chỉ dùng ở bước đăng nhập.</span>
-          </div>
         </div>
 
         <div className="hero-card auth-card auth-card-tight">

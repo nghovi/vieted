@@ -124,11 +124,6 @@ export function SocialAuthForm() {
           </span>
         </button>
       </div>
-
-      <p className="helper-copy">
-        Đăng nhập trực tiếp bằng Gmail, Facebook hoặc TikTok. Trường Điểm Online sẽ tạo
-        hoặc mở hồ sơ học sinh của bạn sau khi xác thực thành công.
-      </p>
     </div>
   );
 }

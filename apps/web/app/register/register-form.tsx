@@ -148,7 +148,7 @@ export function RegisterForm() {
           <div className="otp-panel-header">
             <div>
               <strong>Xác nhận số điện thoại</strong>
-              <p className="helper-copy">Gửi OTP về số điện thoại rồi nhập mã 6 số để hoàn tất đăng ký.</p>
+              <p className="helper-copy">Nhập mã OTP 6 số để xác nhận.</p>
             </div>
             <button
               className="otp-send-button"

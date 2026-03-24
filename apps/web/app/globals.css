@@ -38,6 +38,11 @@ body {
   background: rgba(255, 250, 241, 0.92);
   box-shadow: 0 14px 30px rgba(64, 44, 18, 0.12);
   backdrop-filter: blur(12px);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.01em;
 }
 
 .floating-profile-link {
@@ -51,6 +56,11 @@ body {
   background: rgba(255, 250, 241, 0.92);
   box-shadow: 0 14px 30px rgba(64, 44, 18, 0.12);
   backdrop-filter: blur(12px);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.01em;
 }
 
 .floating-action-stack {
@@ -77,12 +87,16 @@ body {
 }
 
 .floating-home-label {
-  font-weight: 700;
+  font: inherit;
 }
 
 .logout-button {
-  border: 1px solid var(--line);
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
   cursor: pointer;
+  text-decoration: none;
+  color: inherit;
 }
 
 .floating-profile-avatar,
@@ -99,7 +113,7 @@ body {
 }
 
 .floating-profile-label {
-  font-weight: 700;
+  font: inherit;
 }
 
 a {
@@ -203,8 +217,17 @@ a {
   justify-content: center;
   min-height: 46px;
   padding: 0 20px;
+  border: 0;
   border-radius: 999px;
+  appearance: none;
+  -webkit-appearance: none;
+  font-family: inherit;
+  font-size: 1rem;
   font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  white-space: nowrap;
 }
 
 .primary-link {
@@ -215,6 +238,7 @@ a {
 .secondary-link {
   border: 1px solid var(--line);
   background: rgba(255, 250, 241, 0.8);
+  color: var(--ink);
 }
 
 .hero-card {
@@ -310,6 +334,15 @@ a {
   border-radius: 24px;
 }
 
+.settings-card {
+  display: flex;
+  flex-direction: column;
+}
+
+#doi-mat-khau {
+  scroll-margin-top: 96px;
+}
+
 .chapter-feature {
   margin-top: 18px;
 }
@@ -390,7 +423,48 @@ a {
 .action-button {
   border: 0;
   cursor: pointer;
-  font: inherit;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+.settings-card-action {
+  margin-top: 18px;
+  align-self: flex-start;
+}
+
+.profile-password-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(22, 49, 39, 0.24);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.profile-password-modal {
+  width: min(520px, calc(100vw - 40px));
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid rgba(22, 49, 39, 0.1);
+  border-radius: 24px;
+  background: rgba(255, 252, 245, 0.98);
+  box-shadow: 0 26px 60px rgba(64, 44, 18, 0.2);
+  justify-self: center;
+  align-self: center;
+}
+
+.profile-password-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .text-action {
@@ -1100,6 +1174,12 @@ a {
 .avatar-option.is-active {
   border-color: rgba(31, 143, 107, 0.42);
   background: rgba(31, 143, 107, 0.08);
+}
+
+.disabled-link {
+  opacity: 0.55;
+  cursor: default;
+  pointer-events: none;
 }
 
 @media (max-width: 900px) {

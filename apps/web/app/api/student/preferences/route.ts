@@ -3,7 +3,7 @@ import { getServerSessionStudent } from "@/lib/auth";
 import { saveStudentStudyPreference } from "@/lib/db";
 import {
   isSupportedStudyPreference,
-  supportedGrade,
+  supportedGrades,
 } from "@/lib/study-catalog";
 
 export async function POST(request: Request) {
@@ -20,10 +20,10 @@ export async function POST(request: Request) {
 
   if (
     typeof body.currentGrade !== "number" ||
-    body.currentGrade !== supportedGrade
+    !supportedGrades.includes(body.currentGrade as 6 | 7 | 8 | 9)
   ) {
     return NextResponse.json(
-      { error: "Hiện tại hệ thống hỗ trợ lớp 9." },
+      { error: "Hiện tại hệ thống hỗ trợ từ lớp 6 đến lớp 9." },
       { status: 400 },
     );
   }

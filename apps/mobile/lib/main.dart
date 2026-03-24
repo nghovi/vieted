@@ -51,6 +51,8 @@ class StudentSession {
     required this.currentHistoryChapter,
     required this.currentGeographyChapter,
     required this.currentEnglishChapter,
+    required this.currentMathChapter,
+    required this.currentLiteratureChapter,
   });
 
   final String nickname;
@@ -62,6 +64,8 @@ class StudentSession {
   final String currentHistoryChapter;
   final String currentGeographyChapter;
   final String currentEnglishChapter;
+  final String currentMathChapter;
+  final String currentLiteratureChapter;
 
   String get displayName => nickname;
 
@@ -75,6 +79,8 @@ class StudentSession {
     String? currentHistoryChapter,
     String? currentGeographyChapter,
     String? currentEnglishChapter,
+    String? currentMathChapter,
+    String? currentLiteratureChapter,
   }) {
     return StudentSession(
       nickname: nickname ?? this.nickname,
@@ -87,6 +93,9 @@ class StudentSession {
       currentGeographyChapter:
           currentGeographyChapter ?? this.currentGeographyChapter,
       currentEnglishChapter: currentEnglishChapter ?? this.currentEnglishChapter,
+      currentMathChapter: currentMathChapter ?? this.currentMathChapter,
+      currentLiteratureChapter:
+          currentLiteratureChapter ?? this.currentLiteratureChapter,
     );
   }
 }
@@ -112,6 +121,8 @@ class VietEdAppState extends ChangeNotifier {
       currentHistoryChapter: historyChapterOptions.first,
       currentGeographyChapter: geographyChapterOptions.first,
       currentEnglishChapter: englishChapterOptions.first,
+      currentMathChapter: mathChapterOptions.first,
+      currentLiteratureChapter: literatureChapterOptions[9]!.first,
     );
     notifyListeners();
   }
@@ -127,6 +138,8 @@ class VietEdAppState extends ChangeNotifier {
     required String currentHistoryChapter,
     required String currentGeographyChapter,
     required String currentEnglishChapter,
+    required String currentMathChapter,
+    required String currentLiteratureChapter,
   }) {
     final session = _session;
     if (session == null) {
@@ -139,6 +152,8 @@ class VietEdAppState extends ChangeNotifier {
       currentHistoryChapter: currentHistoryChapter,
       currentGeographyChapter: currentGeographyChapter,
       currentEnglishChapter: currentEnglishChapter,
+      currentMathChapter: currentMathChapter,
+      currentLiteratureChapter: currentLiteratureChapter,
     );
     notifyListeners();
   }
@@ -184,9 +199,9 @@ const gradeOptions = <GradeOption>[
   GradeOption(grade: 3, isAvailable: false),
   GradeOption(grade: 4, isAvailable: false),
   GradeOption(grade: 5, isAvailable: false),
-  GradeOption(grade: 6, isAvailable: false),
-  GradeOption(grade: 7, isAvailable: false),
-  GradeOption(grade: 8, isAvailable: false),
+  GradeOption(grade: 6, isAvailable: true),
+  GradeOption(grade: 7, isAvailable: true),
+  GradeOption(grade: 8, isAvailable: true),
   GradeOption(grade: 9, isAvailable: true),
   GradeOption(grade: 10, isAvailable: false),
   GradeOption(grade: 11, isAvailable: false),
@@ -227,6 +242,85 @@ const englishChapterOptions = <String>[
   'Unit 4. Remembering the Past',
   'Unit 5. Our Experiences',
 ];
+
+const mathChapterOptions = <String>[
+  'Chương 1. Căn bậc hai và căn thức',
+  'Chương 2. Hàm số bậc nhất',
+  'Chương 3. Hệ thức lượng trong tam giác vuông',
+  'Chương 4. Phương trình bậc hai một ẩn',
+  'Chương 5. Thống kê và xác suất thực nghiệm',
+];
+
+const starterCourseChapters = <String, List<String>>{
+  '6|Lịch sử': [
+    'Bài 1. Xã hội nguyên thủy',
+    'Bài 2. Ai Cập và Lưỡng Hà cổ đại',
+    'Bài 3. Nhà nước Văn Lang - Âu Lạc',
+  ],
+  '6|Toán': [
+    'Chương 1. Số tự nhiên',
+    'Chương 2. Phân số',
+    'Chương 3. Hình học cơ bản',
+  ],
+  '6|Tiếng Anh': [
+    'Unit 1. My New School',
+    'Unit 2. My House',
+    'Unit 3. My Friends',
+  ],
+  '6|Ngữ văn': [
+    'Bài 1. Truyện và thơ mở đầu',
+    'Bài 2. Tiếng Việt nền tảng',
+    'Bài 3. Viết đoạn văn',
+  ],
+  '7|Lịch sử': [
+    'Bài 1. Tây Âu thời trung đại',
+    'Bài 2. Đại Việt thời Lý - Trần',
+    'Bài 3. Ba lần kháng chiến chống Mông - Nguyên',
+  ],
+  '7|Toán': [
+    'Chương 1. Số hữu tỉ',
+    'Chương 2. Đại lượng tỉ lệ',
+    'Chương 3. Tam giác',
+  ],
+  '7|Tiếng Anh': [
+    'Unit 1. Hobbies',
+    'Unit 2. Health',
+    'Unit 3. Community Service',
+  ],
+  '7|Ngữ văn': [
+    'Bài 1. Truyện ngụ ngôn và bài học',
+    'Bài 2. Văn bản thông tin',
+    'Bài 3. Viết bài văn ngắn',
+  ],
+  '8|Lịch sử': [
+    'Bài 1. Những cuộc cách mạng tư sản',
+    'Bài 2. Việt Nam thế kỉ XIX',
+    'Bài 3. Pháp xâm lược Việt Nam',
+  ],
+  '8|Toán': [
+    'Chương 1. Đa thức',
+    'Chương 2. Phân thức đại số',
+    'Chương 3. Tứ giác',
+  ],
+  '8|Tiếng Anh': [
+    'Unit 1. Leisure Activities',
+    'Unit 2. Life in the Countryside',
+    'Unit 3. Peoples of Viet Nam',
+  ],
+  '8|Ngữ văn': [
+    'Bài 1. Truyện kí và kí sự',
+    'Bài 2. Văn nghị luận',
+    'Bài 3. Viết bài nghị luận ngắn',
+  ],
+};
+
+const literatureChapterOptions = <int, List<String>>{
+  9: [
+    'Bài 1. Đọc hiểu mở đầu',
+    'Bài 2. Nghị luận và thuyết minh',
+    'Bài 3. Ôn tập kĩ năng',
+  ],
+};
 
 const mobileLearnContent = <String, ({String summary, List<String> keyIdeas})>{
   'Chương 1. Thế giới từ năm 1918 đến năm 1945': (
@@ -394,6 +488,54 @@ const mobileEnglishLearnContent = <String, ({String summary, List<String> keyIde
   ),
 };
 
+const mobileMathLearnContent = <String, ({String summary, List<String> keyIdeas})>{
+  'Chương 1. Căn bậc hai và căn thức': (
+    summary:
+        'Ôn lại căn bậc hai số học, điều kiện xác định và cách biến đổi những biểu thức chứa căn.',
+    keyIdeas: [
+      'Nhận biết căn bậc hai số học và điều kiện xác định.',
+      'Rút gọn biểu thức chứa căn bằng các quy tắc cơ bản.',
+      'Thực hiện đúng cộng, trừ, nhân, chia căn thức.',
+    ],
+  ),
+  'Chương 2. Hàm số bậc nhất': (
+    summary:
+        'Học cách đọc công thức y = ax + b, hiểu hệ số góc và vẽ đồ thị đường thẳng.',
+    keyIdeas: [
+      'Nhận biết hàm số bậc nhất từ công thức.',
+      'Phân biệt vai trò của hệ số a và số tự do b.',
+      'Vẽ đồ thị từ hai điểm hoặc giao điểm với trục tọa độ.',
+    ],
+  ),
+  'Chương 3. Hệ thức lượng trong tam giác vuông': (
+    summary:
+        'Luyện các tỉ số lượng giác cơ bản và vận dụng vào những bài toán khoảng cách, chiều cao.',
+    keyIdeas: [
+      'Xác định đúng cạnh đối, cạnh kề và cạnh huyền.',
+      'Chọn sin, cos hoặc tan theo dữ kiện của bài.',
+      'Giải bài toán thực tế bằng tam giác vuông.',
+    ],
+  ),
+  'Chương 4. Phương trình bậc hai một ẩn': (
+    summary:
+        'Nắm dạng tổng quát của phương trình bậc hai, biệt thức delta và cách tìm nghiệm.',
+    keyIdeas: [
+      'Nhận biết phương trình bậc hai một ẩn.',
+      'Dùng delta để xét số nghiệm.',
+      'Kiểm tra nghiệm và tránh sai dấu khi biến đổi.',
+    ],
+  ),
+  'Chương 5. Thống kê và xác suất thực nghiệm': (
+    summary:
+        'Làm quen cách đọc dữ liệu, mô tả bằng số trung bình và hiểu xác suất từ phép thử thực tế.',
+    keyIdeas: [
+      'Đọc bảng số liệu và nhận xét xu hướng chính.',
+      'Tính các đại lượng thống kê cơ bản.',
+      'Hiểu xác suất thực nghiệm qua số lần xảy ra của biến cố.',
+    ],
+  ),
+};
+
 const mobileTextbookNotLoadedMessage =
     'Trình đọc PDF sẽ mở đúng vào đầu chương hiện tại khi tích hợp bộ xem PDF trên mobile.';
 
@@ -458,7 +600,18 @@ const mobileEnglishChapterStartPages = <String, int>{
   'Unit 5. Our Experiences': 52,
 };
 
-List<String> chapterOptionsForSubject(String subject) {
+const mobileMathChapterStartPages = <String, int>{
+  'Chương 1. Căn bậc hai và căn thức': 8,
+  'Chương 2. Hàm số bậc nhất': 30,
+  'Chương 3. Hệ thức lượng trong tam giác vuông': 56,
+  'Chương 4. Phương trình bậc hai một ẩn': 8,
+  'Chương 5. Thống kê và xác suất thực nghiệm': 74,
+};
+
+List<String> chapterOptionsForStudy(int grade, String subject) {
+  if (starterCourseChapters.containsKey('$grade|$subject')) {
+    return starterCourseChapters['$grade|$subject']!;
+  }
   if (subject == 'Địa lí') {
     return geographyChapterOptions;
   }
@@ -466,41 +619,64 @@ List<String> chapterOptionsForSubject(String subject) {
     return englishChapterOptions;
   }
   if (subject == 'Toán') {
-    return const ['Bài mở đầu. Lộ trình Toán lớp 9'];
+    return mathChapterOptions;
   }
   if (subject == 'Ngữ văn') {
-    return const ['Bài mở đầu. Lộ trình Ngữ văn lớp 9'];
+    return literatureChapterOptions[grade] ??
+        const ['Bài mở đầu. Lộ trình Ngữ văn lớp 9'];
   }
   return historyChapterOptions;
 }
 
 String selectedChapterForSession(StudentSession session) {
+  final starterChapters =
+      starterCourseChapters['${session.currentGrade}|${session.currentSubject}'];
+  if (starterChapters != null && starterChapters.isNotEmpty) {
+    if (session.currentSubject == 'Toán') {
+      return session.currentMathChapter;
+    }
+    if (session.currentSubject == 'Tiếng Anh') {
+      return session.currentEnglishChapter;
+    }
+    if (session.currentSubject == 'Ngữ văn') {
+      return session.currentLiteratureChapter;
+    }
+    return session.currentHistoryChapter;
+  }
   if (session.currentSubject == 'Địa lí') {
     return session.currentGeographyChapter;
   }
   if (session.currentSubject == 'Tiếng Anh') {
     return session.currentEnglishChapter;
   }
-  if (session.currentSubject == 'Toán' || session.currentSubject == 'Ngữ văn') {
-    return chapterOptionsForSubject(session.currentSubject).first;
+  if (session.currentSubject == 'Toán') {
+    return session.currentMathChapter;
+  }
+  if (session.currentSubject == 'Ngữ văn') {
+    return session.currentLiteratureChapter;
   }
   return session.currentHistoryChapter;
 }
 
 ({String summary, List<String> keyIdeas}) learnContentForSubject(
+  int grade,
   String subject,
   String chapterTitle,
 ) {
-  if (subject == 'Toán') {
+  if (starterCourseChapters.containsKey('$grade|$subject')) {
     return (
       summary:
-          'Môn Toán lớp 9 đang được chuẩn bị để mở với lộ trình bài học, bài luyện và đánh giá theo từng chủ đề.',
+          '$chapterTitle là một phần trong lộ trình ${subject.toLowerCase()} lớp $grade đang được mở theo chương.',
       keyIdeas: [
-        'Sẽ có lộ trình học theo chủ đề trọng tâm của chương trình lớp 9.',
-        'Bài luyện sẽ được thiết kế theo mức độ từ cơ bản đến nâng cao.',
-        'Đánh giá tiến độ sẽ theo từng mảng kiến thức để học sinh biết phần cần củng cố.',
+        'Nắm mục tiêu chính của bài học trước khi luyện tập.',
+        'Ghi nhớ các khái niệm, chi tiết hoặc cấu trúc cốt lõi của chương.',
+        'Chuẩn bị cho phần kiểm tra và đánh giá sẽ được nối tiếp trên cùng lộ trình.',
       ],
     );
+  }
+
+  if (subject == 'Toán') {
+    return mobileMathLearnContent[chapterTitle] ?? mobileMathLearnContent.values.first;
   }
 
   if (subject == 'Ngữ văn') {
@@ -524,8 +700,12 @@ String selectedChapterForSession(StudentSession session) {
   return contentMap[chapterTitle] ?? contentMap.values.first;
 }
 
-int chapterStartPageForSubject(String subject, String chapterTitle) {
-  if (subject == 'Toán' || subject == 'Ngữ văn') {
+int chapterStartPageForSubject(int grade, String subject, String chapterTitle) {
+  if (starterCourseChapters.containsKey('$grade|$subject')) {
+    return 1;
+  }
+
+  if (subject == 'Ngữ văn') {
     return 0;
   }
 
@@ -533,6 +713,8 @@ int chapterStartPageForSubject(String subject, String chapterTitle) {
       ? mobileGeographyChapterStartPages
       : subject == 'Tiếng Anh'
           ? mobileEnglishChapterStartPages
+          : subject == 'Toán'
+              ? mobileMathChapterStartPages
           : mobileHistoryChapterStartPages;
 
   return pageMap[chapterTitle] ?? pageMap.values.first;
@@ -830,6 +1012,8 @@ class _StudentHomePageState extends State<StudentHomePage> {
       currentHistoryChapter: session.currentHistoryChapter,
       currentGeographyChapter: session.currentGeographyChapter,
       currentEnglishChapter: session.currentEnglishChapter,
+      currentMathChapter: session.currentMathChapter,
+      currentLiteratureChapter: session.currentLiteratureChapter,
     );
 
     setState(() {
@@ -949,9 +1133,21 @@ class _StudentHomePageState extends State<StudentHomePage> {
                       widget.appState.saveStudyPreference(
                         currentGrade: value,
                         currentSubject: session.currentSubject,
-                        currentHistoryChapter: session.currentHistoryChapter,
+                        currentHistoryChapter:
+                            session.currentSubject == 'Lịch sử'
+                                ? chapterOptionsForStudy(value, session.currentSubject).first
+                                : session.currentHistoryChapter,
                         currentGeographyChapter: session.currentGeographyChapter,
-                        currentEnglishChapter: session.currentEnglishChapter,
+                        currentEnglishChapter:
+                            session.currentSubject == 'Tiếng Anh'
+                                ? chapterOptionsForStudy(value, session.currentSubject).first
+                                : session.currentEnglishChapter,
+                        currentMathChapter: session.currentSubject == 'Toán'
+                            ? chapterOptionsForStudy(value, session.currentSubject).first
+                            : session.currentMathChapter,
+                        currentLiteratureChapter: session.currentSubject == 'Ngữ văn'
+                            ? chapterOptionsForStudy(value, session.currentSubject).first
+                            : session.currentLiteratureChapter,
                       );
                     },
                   ),
@@ -987,9 +1183,19 @@ class _StudentHomePageState extends State<StudentHomePage> {
                       widget.appState.saveStudyPreference(
                         currentGrade: session.currentGrade,
                         currentSubject: value,
-                        currentHistoryChapter: session.currentHistoryChapter,
+                        currentHistoryChapter: value == 'Lịch sử'
+                            ? chapterOptionsForStudy(session.currentGrade, value).first
+                            : session.currentHistoryChapter,
                         currentGeographyChapter: session.currentGeographyChapter,
-                        currentEnglishChapter: session.currentEnglishChapter,
+                        currentEnglishChapter: value == 'Tiếng Anh'
+                            ? chapterOptionsForStudy(session.currentGrade, value).first
+                            : session.currentEnglishChapter,
+                        currentMathChapter: value == 'Toán'
+                            ? chapterOptionsForStudy(session.currentGrade, value).first
+                            : session.currentMathChapter,
+                        currentLiteratureChapter: value == 'Ngữ văn'
+                            ? chapterOptionsForStudy(session.currentGrade, value).first
+                            : session.currentLiteratureChapter,
                       );
                     },
                   ),
@@ -999,7 +1205,10 @@ class _StudentHomePageState extends State<StudentHomePage> {
                     decoration: const InputDecoration(
                       labelText: 'Chương muốn học',
                     ),
-                    items: chapterOptionsForSubject(session.currentSubject)
+                    items: chapterOptionsForStudy(
+                          session.currentGrade,
+                          session.currentSubject,
+                        )
                         .map(
                           (chapter) => DropdownMenuItem<String>(
                             value: chapter,
@@ -1024,6 +1233,12 @@ class _StudentHomePageState extends State<StudentHomePage> {
                         currentEnglishChapter: session.currentSubject == 'Tiếng Anh'
                             ? value
                             : session.currentEnglishChapter,
+                        currentMathChapter: session.currentSubject == 'Toán'
+                            ? value
+                            : session.currentMathChapter,
+                        currentLiteratureChapter: session.currentSubject == 'Ngữ văn'
+                            ? value
+                            : session.currentLiteratureChapter,
                       );
                     },
                   ),
@@ -1060,6 +1275,8 @@ class _StudentHomePageState extends State<StudentHomePage> {
               detail:
                   widget.appState.session!.currentSubject == 'Tiếng Anh'
                       ? 'Đọc nội dung bài học, nắm từ vựng, mẫu câu và ý chính trước khi làm bài.'
+                      : widget.appState.session!.currentSubject == 'Toán'
+                          ? 'Đọc ý chính, nhận diện dạng toán và chuẩn bị trước khi làm bộ câu hỏi.'
                       : widget.appState.session!.currentSubject == 'Lịch sử'
                           ? 'Đọc tóm tắt chương, nắm ý chính và các mốc sự kiện quan trọng trước khi làm bài.'
                           : 'Xem trước lộ trình môn học đang được chuẩn bị trong ứng dụng.',
@@ -1067,6 +1284,7 @@ class _StudentHomePageState extends State<StudentHomePage> {
                 Navigator.of(context).push(
                   MaterialPageRoute<void>(
                     builder: (context) => StudentLearnPage(
+                      grade: widget.appState.session!.currentGrade,
                       subjectLabel: widget.appState.session!.currentSubject,
                       chapterTitle: selectedChapterForSession(widget.appState.session!),
                     ),
@@ -1718,10 +1936,12 @@ class _SessionCard extends StatelessWidget {
 class StudentLearnPage extends StatefulWidget {
   const StudentLearnPage({
     super.key,
+    required this.grade,
     required this.subjectLabel,
     required this.chapterTitle,
   });
 
+  final int grade;
   final String subjectLabel;
   final String chapterTitle;
 
@@ -1736,9 +1956,17 @@ class _StudentLearnPageState extends State<StudentLearnPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final learnContent =
-        learnContentForSubject(widget.subjectLabel, widget.chapterTitle);
+        learnContentForSubject(
+          widget.grade,
+          widget.subjectLabel,
+          widget.chapterTitle,
+        );
     final chapterStartPage =
-        chapterStartPageForSubject(widget.subjectLabel, widget.chapterTitle);
+        chapterStartPageForSubject(
+          widget.grade,
+          widget.subjectLabel,
+          widget.chapterTitle,
+        );
 
     return Scaffold(
       appBar: AppBar(
@@ -1828,7 +2056,7 @@ class _StudentLearnPageState extends State<StudentLearnPage> {
                         : widget.subjectLabel == 'Tiếng Anh'
                             ? 'Nắm từ vựng, mẫu câu, chủ điểm ngữ pháp và tình huống giao tiếp chính trước khi làm bài kiểm tra.'
                         : widget.subjectLabel == 'Toán'
-                            ? 'Xem trước cấu trúc môn học, dạng bài trọng tâm và lộ trình nội dung sẽ được mở tiếp theo.'
+                            ? 'Nắm khái niệm, dạng bài trọng tâm và cách nhận diện lỗi sai thường gặp trước khi làm bài kiểm tra.'
                             : widget.subjectLabel == 'Ngữ văn'
                                 ? 'Xem trước nhóm kỹ năng đọc hiểu, tiếng Việt và làm văn sẽ được mở trong các đợt tới.'
                         : 'Nắm bối cảnh, các mốc thời gian, nhân vật và ý chính của chương trước khi làm bài kiểm tra.',
@@ -1862,7 +2090,7 @@ class _StudentLearnPageState extends State<StudentLearnPage> {
                       widget.subjectLabel == 'Tiếng Anh'
                           ? 'Nguồn cấu trúc bài học: Tiếng Anh 9 - Global Success.'
                           : widget.subjectLabel == 'Toán'
-                              ? 'Lộ trình môn Toán lớp 9 đang được hoàn thiện.'
+                              ? 'Nguồn cấu trúc bài học: Toán lớp 9 - Kết nối tri thức với cuộc sống.'
                               : widget.subjectLabel == 'Ngữ văn'
                                   ? 'Lộ trình môn Ngữ văn lớp 9 đang được hoàn thiện.'
                           : 'Nguồn cấu trúc chương: Lịch sử và Địa lí 9 - Kết nối tri thức với cuộc sống.',
@@ -1873,7 +2101,7 @@ class _StudentLearnPageState extends State<StudentLearnPage> {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      (widget.subjectLabel == 'Toán' || widget.subjectLabel == 'Ngữ văn')
+                      (widget.subjectLabel == 'Ngữ văn')
                           ? 'Môn học này đang ở giai đoạn chuẩn bị nội dung. Ứng dụng sẽ mở bài học, bài luyện và đánh giá trong các bản cập nhật tới.'
                           : '$mobileTextbookNotLoadedMessage Trang neo hiện tại: $chapterStartPage.',
                       style: theme.textTheme.bodyMedium?.copyWith(

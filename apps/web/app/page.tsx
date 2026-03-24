@@ -1,34 +1,35 @@
 import Link from "next/link";
 import {
   getServerSelectedEnglishChapter,
-  getServerSelectedGeographyChapter,
   getServerSelectedHistoryChapter,
+  getServerSelectedMathChapter,
   getServerSessionStudent,
   getServerStudyPreference,
 } from "@/lib/auth";
 import {
   getEnglishChapterByIdFromDb,
   getEnglishEvaluationOverview,
-  getGeographyChapterByIdFromDb,
-  getGeographyEvaluationOverview,
   listEnglishChaptersFromDb,
-  listGeographyChaptersFromDb,
   getHistoryChapterByIdFromDb,
   getHistoryEvaluationOverview,
   listHistoryChaptersFromDb,
+  getMathChapterByIdFromDb,
+  getMathEvaluationOverview,
+  listMathChaptersFromDb,
 } from "@/lib/db";
 import { grade9EnglishChapters } from "@/lib/english-grade-9";
-import { grade9GeographyChapters } from "@/lib/geography-grade-9";
 import { grade9HistoryChapters } from "@/lib/history-grade-9";
+import { grade9MathChapters } from "@/lib/math-grade-9";
+import { getCourseCatalogEntry, getCoursePath } from "@/lib/course-catalog";
 import { EnglishChapterForm } from "./english-chapter-form";
-import { GeographyChapterForm } from "./geography-chapter-form";
 import { HistoryChapterForm } from "./history-chapter-form";
+import { MathChapterForm } from "./math-chapter-form";
 import { StudyPreferencesForm } from "./study-preferences-form";
 
 const quickStats = [
-  { label: "Khối lớp bắt đầu", value: "Lớp 9" },
+  { label: "Khối lớp đang mở", value: "Lớp 6 đến lớp 9" },
   { label: "Môn học trọng tâm", value: "Lịch sử, Toán, Ngữ văn, Tiếng Anh" },
-  { label: "Chế độ học", value: "Học, kiểm tra, đánh giá" },
+  { label: "Chế độ học", value: "Học theo chương, mở rộng dần kiểm tra và đánh giá" },
 ];
 
 const previewSubjectContent: Record<
@@ -85,13 +86,9 @@ export default async function HomePage() {
   const student = await getServerSessionStudent();
   const preference = await getServerStudyPreference();
   const selectedHistoryChapterId = await getServerSelectedHistoryChapter();
-  const selectedGeographyChapterId = await getServerSelectedGeographyChapter();
   const selectedEnglishChapterId = await getServerSelectedEnglishChapter();
+  const selectedMathChapterId = await getServerSelectedMathChapter();
   let chapterChoices = grade9HistoryChapters.map((chapter) => ({
-    id: chapter.id,
-    title: chapter.title,
-  }));
-  let geographyChapterChoices = grade9GeographyChapters.map((chapter) => ({
     id: chapter.id,
     title: chapter.title,
   }));
@@ -99,30 +96,34 @@ export default async function HomePage() {
     id: chapter.id,
     title: chapter.title,
   }));
+  let mathChapterChoices = grade9MathChapters.map((chapter) => ({
+    id: chapter.id,
+    title: chapter.title,
+  }));
   let selectedHistoryChapter =
     grade9HistoryChapters.find((chapter) => chapter.id === selectedHistoryChapterId) ??
     grade9HistoryChapters[0] ??
-    null;
-  let selectedGeographyChapter =
-    grade9GeographyChapters.find((chapter) => chapter.id === selectedGeographyChapterId) ??
-    grade9GeographyChapters[0] ??
     null;
   let selectedEnglishChapter =
     grade9EnglishChapters.find((chapter) => chapter.id === selectedEnglishChapterId) ??
     grade9EnglishChapters[0] ??
     null;
+  let selectedMathChapter =
+    grade9MathChapters.find((chapter) => chapter.id === selectedMathChapterId) ??
+    grade9MathChapters[0] ??
+    null;
   const subjectLabel =
     subjectLabels[preference.currentSubject] ?? preference.currentSubject;
+  const genericCourse = getCourseCatalogEntry(
+    preference.currentGrade,
+    preference.currentSubject,
+  );
   let historyEvaluation = null;
-  let geographyEvaluation = null;
   let englishEvaluation = null;
+  let mathEvaluation = null;
 
   try {
     chapterChoices = (await listHistoryChaptersFromDb()).map((chapter) => ({
-      id: chapter.id,
-      title: chapter.title,
-    }));
-    geographyChapterChoices = (await listGeographyChaptersFromDb()).map((chapter) => ({
       id: chapter.id,
       title: chapter.title,
     }));
@@ -130,21 +131,25 @@ export default async function HomePage() {
       id: chapter.id,
       title: chapter.title,
     }));
+    mathChapterChoices = (await listMathChaptersFromDb()).map((chapter) => ({
+      id: chapter.id,
+      title: chapter.title,
+    }));
     selectedHistoryChapter =
       (await getHistoryChapterByIdFromDb(selectedHistoryChapterId)) ??
       selectedHistoryChapter ??
-      null;
-    selectedGeographyChapter =
-      (await getGeographyChapterByIdFromDb(selectedGeographyChapterId)) ??
-      selectedGeographyChapter ??
       null;
     selectedEnglishChapter =
       (await getEnglishChapterByIdFromDb(selectedEnglishChapterId)) ??
       selectedEnglishChapter ??
       null;
+    selectedMathChapter =
+      (await getMathChapterByIdFromDb(selectedMathChapterId)) ??
+      selectedMathChapter ??
+      null;
     historyEvaluation = student ? await getHistoryEvaluationOverview(student.dbId) : null;
-    geographyEvaluation = student ? await getGeographyEvaluationOverview(student.dbId) : null;
     englishEvaluation = student ? await getEnglishEvaluationOverview(student.dbId) : null;
+    mathEvaluation = student ? await getMathEvaluationOverview(student.dbId) : null;
   } catch (error) {
     console.error("Falling back to bundled homepage content because DB is unavailable.", error);
   }
@@ -153,41 +158,62 @@ export default async function HomePage() {
       ? selectedHistoryChapter
       : preference.currentSubject === "english"
         ? selectedEnglishChapter
+        : preference.currentSubject === "math"
+          ? selectedMathChapter
         : null;
   const selectedChapters =
     preference.currentSubject === "history"
       ? chapterChoices
       : preference.currentSubject === "english"
         ? englishChapterChoices
+        : preference.currentSubject === "math"
+          ? mathChapterChoices
         : [];
   const selectedEvaluation =
     preference.currentSubject === "history"
       ? historyEvaluation
       : preference.currentSubject === "english"
         ? englishEvaluation
+        : preference.currentSubject === "math"
+          ? mathEvaluation
         : null;
   const subjectEyebrow =
-    preference.currentSubject === "history"
+    preference.currentGrade < 9 || preference.currentSubject === "literature"
+      ? `Khởi đầu với ${subjectLabel} ${preference.currentGrade}`
+      : preference.currentSubject === "history"
       ? "Khởi đầu với Lịch sử 9"
       : preference.currentSubject === "english"
         ? "Khởi đầu với Tiếng Anh 9"
+        : preference.currentSubject === "math"
+          ? "Khởi đầu với Toán 9"
         : previewSubjectContent[preference.currentSubject]?.eyebrow ??
           "Môn học đang hoàn thiện";
   const subjectHeading =
-    preference.currentSubject === "history"
+    preference.currentGrade < 9 || preference.currentSubject === "literature"
+      ? `Danh mục bài học mở đầu cho học sinh lớp ${preference.currentGrade} môn ${subjectLabel}.`
+      : preference.currentSubject === "history"
       ? "Chủ đề mở đầu cho học sinh lớp 9 môn Lịch sử."
       : preference.currentSubject === "english"
         ? "Bài học mở đầu cho học sinh lớp 9 môn Tiếng Anh."
+        : preference.currentSubject === "math"
+          ? "Chủ đề mở đầu cho học sinh lớp 9 môn Toán."
         : previewSubjectContent[preference.currentSubject]?.heading ??
           "Nội dung môn học đang được cập nhật.";
   const subjectBasePath =
-    preference.currentSubject === "history"
+    preference.currentGrade < 9 || preference.currentSubject === "literature"
+      ? getCoursePath(preference.currentGrade, preference.currentSubject)
+      : preference.currentSubject === "history"
       ? "/history/grade-9"
-      : "/english/grade-9";
+      : preference.currentSubject === "english"
+        ? "/english/grade-9"
+        : "/math/grade-9";
   const isLoggedIn = Boolean(student);
   const isLiveSubject =
-    preference.currentSubject === "history" ||
-    preference.currentSubject === "english";
+    (preference.currentGrade === 9 &&
+      (preference.currentSubject === "history" ||
+        preference.currentSubject === "english" ||
+        preference.currentSubject === "math")) ||
+    false;
 
   if (isLiveSubject && !selectedChapter) {
     throw new Error("Subject chapters are not available.");
@@ -300,6 +326,14 @@ export default async function HomePage() {
                         title: chapter.title,
                       }))}
                     />
+                  ) : preference.currentSubject === "math" ? (
+                    <MathChapterForm
+                      initialChapterId={selectedChapter.id}
+                      chapters={selectedChapters.map((chapter) => ({
+                        id: chapter.id,
+                        title: chapter.title,
+                      }))}
+                    />
                   ) : (
                     <EnglishChapterForm
                       initialChapterId={selectedChapter.id}
@@ -309,6 +343,26 @@ export default async function HomePage() {
                       }))}
                     />
                   )}
+                </>
+              ) : genericCourse ? (
+                <>
+                  <h3>{genericCourse.title}</h3>
+                  <p>{genericCourse.summary}</p>
+                  <p className="helper-copy">
+                    Đang mở {genericCourse.chapters.length} chương đầu tiên cho lớp{" "}
+                    {preference.currentGrade}.
+                  </p>
+                  <div className="inline-actions">
+                    <Link href={subjectBasePath} className="primary-link">
+                      Xem danh sách chương
+                    </Link>
+                    <Link
+                      href={`${subjectBasePath}/${genericCourse.chapters[0]?.id}/learn`}
+                      className="secondary-link"
+                    >
+                      Vào bài đầu tiên
+                    </Link>
+                  </div>
                 </>
               ) : (
                 <>
@@ -321,7 +375,7 @@ export default async function HomePage() {
                       "Nội dung môn học này sẽ được bổ sung sớm."}
                   </p>
                   <p className="helper-copy">
-                    Hiện tại trải nghiệm đầy đủ đang có cho Lịch sử và Tiếng Anh.
+                    Một số môn học đang tiếp tục được hoàn thiện để mở rộng lộ trình học.
                   </p>
                 </>
               )}
@@ -387,7 +441,9 @@ export default async function HomePage() {
                 <p>
                   {isLiveSubject
                     ? "Làm bài kiểm tra để bắt đầu theo dõi tiến độ."
-                    : "Toán và Ngữ văn đang được chuẩn bị nội dung trước khi mở hệ thống đánh giá."}
+                    : genericCourse
+                      ? `Lớp ${preference.currentGrade} môn ${subjectLabel} hiện đã mở danh mục chương và phần học trước.`
+                      : "Môn học này sẽ hiển thị đánh giá ngay khi nội dung và bài kiểm tra được mở."}
                 </p>
               </div>
             )}

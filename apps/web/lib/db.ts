@@ -18,6 +18,12 @@ import {
   type HistoryQuestion,
   type HistoryQuestionSet,
 } from "./history-grade-9";
+import {
+  getMathChapterModeContent,
+  grade9MathChapters,
+  type MathQuestion,
+  type MathQuestionSet,
+} from "./math-grade-9";
 
 export type DbStudent = {
   id: number;
@@ -37,6 +43,7 @@ export type DbStudyPreference = {
   currentHistoryChapterId: string;
   currentGeographyChapterId: string;
   currentEnglishChapterId: string;
+  currentMathChapterId: string;
 };
 
 export type DbStudentPhoneOtp = {
@@ -127,6 +134,10 @@ export type EnglishEvaluationOverview = HistoryEvaluationOverview;
 export type EnglishChapterEvaluation = HistoryChapterEvaluation;
 export type EnglishQuestionSetProgress = HistoryQuestionSetProgress;
 export type EnglishQuestionSetAttemptResult = HistoryQuestionSetAttemptResult;
+export type MathEvaluationOverview = HistoryEvaluationOverview;
+export type MathChapterEvaluation = HistoryChapterEvaluation;
+export type MathQuestionSetProgress = HistoryQuestionSetProgress;
+export type MathQuestionSetAttemptResult = HistoryQuestionSetAttemptResult;
 
 export type HistoryTextbookChapter = {
   chapterId: string;
@@ -421,6 +432,51 @@ function buildEnglishChapter(
   };
 }
 
+function buildMathChapter(
+  chapterRow: HistoryChapterRow,
+  setRows: HistoryQuestionSetRow[],
+  questionRows: HistoryQuestionRow[],
+) {
+  const questionSets: MathQuestionSet[] = setRows
+    .sort((a, b) => a.sortOrder - b.sortOrder)
+    .map((setRow) => {
+      const questions: MathQuestion[] = questionRows
+        .filter((questionRow) => questionRow.setId === setRow.id)
+        .sort((a, b) => a.sortOrder - b.sortOrder)
+        .map((questionRow) => ({
+          id: questionRow.id,
+          prompt: questionRow.prompt,
+          options: parseJsonArray(questionRow.optionsJson),
+          correctOption: questionRow.correctOption,
+          explanation: questionRow.explanation,
+        }));
+
+      return {
+        id: setRow.id,
+        title: setRow.title,
+        questions,
+      };
+    });
+
+  return {
+    id: chapterRow.id,
+    title: chapterRow.title,
+    summary: chapterRow.summary,
+    textbookScope: chapterRow.textbookScope,
+    questionSets,
+    modeContent: {
+      learn: {
+        overview: chapterRow.learnOverview,
+        keyIdeas: parseJsonArray(chapterRow.learnKeyIdeasJson),
+      },
+      review: {
+        checklist: parseJsonArray(chapterRow.reviewChecklistJson),
+        quickPrompts: parseJsonArray(chapterRow.reviewQuickPromptsJson),
+      },
+    },
+  };
+}
+
 export function verifyPassword(password: string, hash: string) {
   if (!hash) {
     return false;
@@ -605,15 +661,17 @@ export async function createStudentAccount(
   await pool.query(
     `insert into study_preferences (
        student_id, current_grade, current_subject,
-       current_history_chapter_id, current_geography_chapter_id, current_english_chapter_id
+       current_history_chapter_id, current_geography_chapter_id, current_english_chapter_id,
+       current_math_chapter_id
      )
-     values (?, ?, 'history', 'chuong-1-the-gioi-1918-1945', 'chuong-1-dia-li-dan-cu-viet-nam', 'unit-1-local-community')
+     values (?, ?, 'history', 'chuong-1-the-gioi-1918-1945', 'chuong-1-dia-li-dan-cu-viet-nam', 'unit-1-local-community', 'chuong-1-can-bac-hai-va-can-thuc')
      on duplicate key update
        current_grade = values(current_grade),
        current_subject = values(current_subject),
        current_history_chapter_id = values(current_history_chapter_id),
        current_geography_chapter_id = values(current_geography_chapter_id),
-       current_english_chapter_id = values(current_english_chapter_id)`,
+       current_english_chapter_id = values(current_english_chapter_id),
+       current_math_chapter_id = values(current_math_chapter_id)`,
     [studentId, grade],
   );
 
@@ -709,7 +767,8 @@ export async function getStudentStudyPreference(studentId: number) {
     `select current_grade as currentGrade, current_subject as currentSubject,
             current_history_chapter_id as currentHistoryChapterId,
             current_geography_chapter_id as currentGeographyChapterId,
-            current_english_chapter_id as currentEnglishChapterId
+            current_english_chapter_id as currentEnglishChapterId,
+            current_math_chapter_id as currentMathChapterId
      from study_preferences
      where student_id = ?
      limit 1`,
@@ -727,9 +786,10 @@ export async function saveStudentStudyPreference(
   await pool.query(
     `insert into study_preferences (
        student_id, current_grade, current_subject,
-       current_history_chapter_id, current_geography_chapter_id, current_english_chapter_id
+       current_history_chapter_id, current_geography_chapter_id, current_english_chapter_id,
+       current_math_chapter_id
      )
-     values (?, ?, ?, 'chuong-1-the-gioi-1918-1945', 'chuong-1-dia-li-dan-cu-viet-nam', 'unit-1-local-community')
+     values (?, ?, ?, 'chuong-1-the-gioi-1918-1945', 'chuong-1-dia-li-dan-cu-viet-nam', 'unit-1-local-community', 'chuong-1-can-bac-hai-va-can-thuc')
      on duplicate key update
        current_grade = values(current_grade),
        current_subject = values(current_subject)`,
@@ -744,9 +804,10 @@ export async function saveStudentHistoryChapter(
   await pool.query(
     `insert into study_preferences (
        student_id, current_grade, current_subject,
-       current_history_chapter_id, current_geography_chapter_id, current_english_chapter_id
+       current_history_chapter_id, current_geography_chapter_id, current_english_chapter_id,
+       current_math_chapter_id
      )
-     values (?, 9, 'history', ?, 'chuong-1-dia-li-dan-cu-viet-nam', 'unit-1-local-community')
+     values (?, 9, 'history', ?, 'chuong-1-dia-li-dan-cu-viet-nam', 'unit-1-local-community', 'chuong-1-can-bac-hai-va-can-thuc')
      on duplicate key update
        current_history_chapter_id = values(current_history_chapter_id)`,
     [studentId, currentHistoryChapterId],
@@ -760,9 +821,10 @@ export async function saveStudentGeographyChapter(
   await pool.query(
     `insert into study_preferences (
        student_id, current_grade, current_subject,
-       current_history_chapter_id, current_geography_chapter_id, current_english_chapter_id
+       current_history_chapter_id, current_geography_chapter_id, current_english_chapter_id,
+       current_math_chapter_id
      )
-     values (?, 9, 'geography', 'chuong-1-the-gioi-1918-1945', ?, 'unit-1-local-community')
+     values (?, 9, 'geography', 'chuong-1-the-gioi-1918-1945', ?, 'unit-1-local-community', 'chuong-1-can-bac-hai-va-can-thuc')
      on duplicate key update
        current_geography_chapter_id = values(current_geography_chapter_id)`,
     [studentId, currentGeographyChapterId],
@@ -776,12 +838,30 @@ export async function saveStudentEnglishChapter(
   await pool.query(
     `insert into study_preferences (
        student_id, current_grade, current_subject,
-       current_history_chapter_id, current_geography_chapter_id, current_english_chapter_id
+       current_history_chapter_id, current_geography_chapter_id, current_english_chapter_id,
+       current_math_chapter_id
      )
-     values (?, 9, 'english', 'chuong-1-the-gioi-1918-1945', 'chuong-1-dia-li-dan-cu-viet-nam', ?)
+     values (?, 9, 'english', 'chuong-1-the-gioi-1918-1945', 'chuong-1-dia-li-dan-cu-viet-nam', ?, 'chuong-1-can-bac-hai-va-can-thuc')
      on duplicate key update
        current_english_chapter_id = values(current_english_chapter_id)`,
     [studentId, currentEnglishChapterId],
+  );
+}
+
+export async function saveStudentMathChapter(
+  studentId: number,
+  currentMathChapterId: string,
+) {
+  await pool.query(
+    `insert into study_preferences (
+       student_id, current_grade, current_subject,
+       current_history_chapter_id, current_geography_chapter_id, current_english_chapter_id,
+       current_math_chapter_id
+     )
+     values (?, 9, 'math', 'chuong-1-the-gioi-1918-1945', 'chuong-1-dia-li-dan-cu-viet-nam', 'unit-1-local-community', ?)
+     on duplicate key update
+       current_math_chapter_id = values(current_math_chapter_id)`,
+    [studentId, currentMathChapterId],
   );
 }
 
@@ -978,6 +1058,78 @@ export async function ensureEnglishContentSeeded() {
       for (const [questionIndex, question] of questionSet.questions.entries()) {
         await pool.query(
           `insert into english_questions (
+             id, question_set_id, prompt, options_json, correct_option, explanation, sort_order
+           ) values (?, ?, ?, ?, ?, ?, ?)
+           on duplicate key update
+             question_set_id = values(question_set_id),
+             prompt = values(prompt),
+             options_json = values(options_json),
+             correct_option = values(correct_option),
+             explanation = values(explanation),
+             sort_order = values(sort_order)`,
+          [
+            question.id,
+            questionSet.id,
+            question.prompt,
+            JSON.stringify(question.options),
+            question.correctOption,
+            question.explanation,
+            questionIndex + 1,
+          ],
+        );
+      }
+    }
+  }
+}
+
+export async function ensureMathContentSeeded() {
+  for (const [chapterIndex, chapter] of grade9MathChapters.entries()) {
+    const modeContent = getMathChapterModeContent(chapter.id);
+    if (!modeContent) {
+      continue;
+    }
+
+    await pool.query(
+      `insert into math_chapters (
+         id, title, summary, textbook_scope, learn_overview,
+         learn_key_ideas_json, review_checklist_json, review_quick_prompts_json, sort_order
+       ) values (?, ?, ?, ?, ?, ?, ?, ?, ?)
+       on duplicate key update
+         title = values(title),
+         summary = values(summary),
+         textbook_scope = values(textbook_scope),
+         learn_overview = values(learn_overview),
+         learn_key_ideas_json = values(learn_key_ideas_json),
+         review_checklist_json = values(review_checklist_json),
+         review_quick_prompts_json = values(review_quick_prompts_json),
+         sort_order = values(sort_order)`,
+      [
+        chapter.id,
+        chapter.title,
+        chapter.summary,
+        chapter.textbookScope,
+        modeContent.learn.overview,
+        JSON.stringify(modeContent.learn.keyIdeas),
+        JSON.stringify(modeContent.review.checklist),
+        JSON.stringify(modeContent.review.quickPrompts),
+        chapterIndex + 1,
+      ],
+    );
+
+    for (const [setIndex, questionSet] of chapter.questionSets.entries()) {
+      await pool.query(
+        `insert into math_question_sets (id, chapter_id, title, sort_order)
+         values (?, ?, ?, ?)
+         on duplicate key update
+           chapter_id = values(chapter_id),
+           title = values(title),
+           sort_order = values(sort_order)`,
+        [questionSet.id, chapter.id, questionSet.title, setIndex + 1],
+      );
+
+      for (const [questionIndex, question] of questionSet.questions.entries()) {
+        await pool.query(
+          `insert into math_questions (
              id, question_set_id, prompt, options_json, correct_option, explanation, sort_order
            ) values (?, ?, ?, ?, ?, ?, ?)
            on duplicate key update
@@ -1398,6 +1550,138 @@ export async function getEnglishQuestionSetByIdFromDb(chapterId: string, setId: 
   };
 }
 
+export async function listMathChaptersFromDb() {
+  await ensureMathContentSeeded();
+
+  const [chapterRows] = await pool.query(
+    `select
+       id,
+       title,
+       summary,
+       textbook_scope as textbookScope,
+       learn_overview as learnOverview,
+       learn_key_ideas_json as learnKeyIdeasJson,
+       review_checklist_json as reviewChecklistJson,
+       review_quick_prompts_json as reviewQuickPromptsJson,
+       sort_order as sortOrder
+     from math_chapters
+     order by sort_order asc`,
+  );
+
+  const chapters = chapterRows as HistoryChapterRow[];
+  const [setRows] = await pool.query(
+    `select id, chapter_id as chapterId, title, sort_order as sortOrder
+     from math_question_sets
+     order by sort_order asc`,
+  );
+  const [questionRows] = await pool.query(
+    `select id, question_set_id as setId, prompt, options_json as optionsJson,
+            correct_option as correctOption, explanation, sort_order as sortOrder
+     from math_questions
+     order by sort_order asc`,
+  );
+
+  return chapters.map((chapterRow) =>
+    buildMathChapter(
+      chapterRow,
+      (setRows as HistoryQuestionSetRow[]).filter((setRow) => setRow.chapterId === chapterRow.id),
+      questionRows as HistoryQuestionRow[],
+    ),
+  );
+}
+
+export async function getMathChapterByIdFromDb(chapterId: string) {
+  await ensureMathContentSeeded();
+
+  const [chapterRows] = await pool.query(
+    `select
+       id,
+       title,
+       summary,
+       textbook_scope as textbookScope,
+       learn_overview as learnOverview,
+       learn_key_ideas_json as learnKeyIdeasJson,
+       review_checklist_json as reviewChecklistJson,
+       review_quick_prompts_json as reviewQuickPromptsJson,
+       sort_order as sortOrder
+     from math_chapters
+     where id = ?
+     limit 1`,
+    [chapterId],
+  );
+
+  const chapterRow = (chapterRows as HistoryChapterRow[])[0];
+  if (!chapterRow) {
+    return null;
+  }
+
+  const [setRows] = await pool.query(
+    `select id, chapter_id as chapterId, title, sort_order as sortOrder
+     from math_question_sets
+     where chapter_id = ?
+     order by sort_order asc`,
+    [chapterId],
+  );
+  const [questionRows] = await pool.query(
+    `select q.id, q.question_set_id as setId, q.prompt, q.options_json as optionsJson,
+            q.correct_option as correctOption, q.explanation, q.sort_order as sortOrder
+     from math_questions q
+     join math_question_sets s on s.id = q.question_set_id
+     where s.chapter_id = ?
+     order by s.sort_order asc, q.sort_order asc`,
+    [chapterId],
+  );
+
+  return buildMathChapter(
+    chapterRow,
+    setRows as HistoryQuestionSetRow[],
+    questionRows as HistoryQuestionRow[],
+  );
+}
+
+export async function getMathQuestionSetByIdFromDb(chapterId: string, setId: string) {
+  await ensureMathContentSeeded();
+
+  const [setRows] = await pool.query(
+    `select s.id, s.title, c.title as chapterTitle
+     from math_question_sets s
+     join math_chapters c on c.id = s.chapter_id
+     where s.id = ? and s.chapter_id = ?
+     limit 1`,
+    [setId, chapterId],
+  );
+
+  const setRow = (setRows as Array<{ id: string; title: string; chapterTitle: string }>)[0];
+  if (!setRow) {
+    return null;
+  }
+
+  const [questionRows] = await pool.query(
+    `select id, question_set_id as setId, prompt, options_json as optionsJson,
+            correct_option as correctOption, explanation, sort_order as sortOrder
+     from math_questions
+     where question_set_id = ?
+     order by sort_order asc`,
+    [setId],
+  );
+
+  const questions: MathQuestion[] = (questionRows as HistoryQuestionRow[]).map((row) => ({
+    id: row.id,
+    prompt: row.prompt,
+    options: parseJsonArray(row.optionsJson),
+    correctOption: row.correctOption,
+    explanation: row.explanation,
+  }));
+
+  return {
+    chapterId,
+    chapterTitle: setRow.chapterTitle,
+    id: setRow.id,
+    title: setRow.title,
+    questions,
+  };
+}
+
 export async function listHistoryQuestionSetsWithProgress(
   studentId: number,
   chapterId: string,
@@ -1555,6 +1839,58 @@ export async function listEnglishQuestionSetsWithProgress(
   });
 }
 
+export async function listMathQuestionSetsWithProgress(
+  studentId: number,
+  chapterId: string,
+) {
+  await ensureMathContentSeeded();
+
+  const chapter = await getMathChapterByIdFromDb(chapterId);
+  if (!chapter) {
+    return null;
+  }
+
+  const [attemptRows] = await pool.query(
+    `select
+       a.id,
+       a.chapter_id as chapterId,
+       a.question_set_id as questionSetId,
+       s.title as setTitle,
+       a.score_percent as scorePercent,
+       a.correct_count as correctCount,
+       a.total_questions as totalQuestions,
+       a.submitted_at as submittedAt
+     from student_math_set_attempts a
+     join math_question_sets s on s.id = a.question_set_id
+     where a.student_id = ? and a.chapter_id = ?
+     order by a.submitted_at desc`,
+    [studentId, chapterId],
+  );
+
+  const attempts = attemptRows as SetAttemptRow[];
+
+  return chapter.questionSets.map((set) => {
+    const setAttempts = attempts.filter((attempt) => attempt.questionSetId === set.id);
+    const latestScore = setAttempts.length > 0 ? Number(setAttempts[0].scorePercent) : null;
+    const bestScore =
+      setAttempts.length > 0
+        ? Math.max(...setAttempts.map((attempt) => Number(attempt.scorePercent)))
+        : null;
+
+    return {
+      setId: set.id,
+      setTitle: set.title,
+      questionCount: set.questions.length,
+      attempts: setAttempts.length,
+      bestScore,
+      latestScore,
+      lastSubmittedAt: toIsoOrNull(setAttempts[0]?.submittedAt ?? null),
+      masteryLabel: getMasteryLabel(latestScore ?? bestScore),
+      attemptHistory: buildAttemptHistory(setAttempts),
+    } satisfies MathQuestionSetProgress;
+  });
+}
+
 export async function getLatestHistoryQuestionSetAttempt(
   studentId: number,
   chapterId: string,
@@ -1652,6 +1988,45 @@ export async function getLatestEnglishQuestionSetAttempt(
        a.submitted_at as submittedAt
      from student_english_set_attempts a
      join english_question_sets s on s.id = a.question_set_id
+     where a.student_id = ? and a.chapter_id = ? and a.question_set_id = ?
+     order by a.submitted_at desc
+     limit 1`,
+    [studentId, chapterId, setId],
+  );
+
+  const attempt = (attemptRows as SetAttemptRow[])[0];
+  if (!attempt) {
+    return null;
+  }
+
+  return {
+    attemptId: attempt.id,
+    scorePercent: Number(attempt.scorePercent),
+    correctCount: attempt.correctCount,
+    totalQuestions: attempt.totalQuestions,
+    submittedAt: toIsoOrNull(attempt.submittedAt)!,
+  };
+}
+
+export async function getLatestMathQuestionSetAttempt(
+  studentId: number,
+  chapterId: string,
+  setId: string,
+) {
+  await ensureMathContentSeeded();
+
+  const [attemptRows] = await pool.query(
+    `select
+       a.id,
+       a.chapter_id as chapterId,
+       a.question_set_id as questionSetId,
+       s.title as setTitle,
+       a.score_percent as scorePercent,
+       a.correct_count as correctCount,
+       a.total_questions as totalQuestions,
+       a.submitted_at as submittedAt
+     from student_math_set_attempts a
+     join math_question_sets s on s.id = a.question_set_id
      where a.student_id = ? and a.chapter_id = ? and a.question_set_id = ?
      order by a.submitted_at desc
      limit 1`,
@@ -1996,6 +2371,113 @@ export async function submitEnglishQuestionSetAttempt(
   };
 }
 
+export async function submitMathQuestionSetAttempt(
+  studentId: number,
+  chapterId: string,
+  setId: string,
+  answers: Array<{ questionId: string; selectedOption: number }>,
+) {
+  await ensureMathContentSeeded();
+
+  const questionSet = await getMathQuestionSetByIdFromDb(chapterId, setId);
+  if (!questionSet) {
+    return null;
+  }
+
+  const answerMap = new Map<string, number>();
+  for (const answer of answers) {
+    if (!Number.isInteger(answer.selectedOption)) {
+      continue;
+    }
+
+    answerMap.set(answer.questionId, answer.selectedOption);
+  }
+
+  const missingQuestions = questionSet.questions.filter((question) => !answerMap.has(question.id));
+  if (missingQuestions.length > 0) {
+    return {
+      ok: false as const,
+      message: "Em cần chọn đáp án cho tất cả câu hỏi trước khi nộp bài.",
+    };
+  }
+
+  const gradedQuestions = questionSet.questions.map((question) => {
+    const selectedOption = answerMap.get(question.id)!;
+    const isCorrect = selectedOption === question.correctOption;
+
+    return {
+      questionId: question.id,
+      prompt: question.prompt,
+      options: question.options,
+      selectedOption,
+      correctOption: question.correctOption,
+      isCorrect,
+      explanation: question.explanation,
+    };
+  });
+
+  const correctCount = gradedQuestions.filter((question) => question.isCorrect).length;
+  const totalQuestions = gradedQuestions.length;
+  const scorePercent = Number(((correctCount / totalQuestions) * 100).toFixed(1));
+
+  const [insertedAttempt] = await pool.query(
+    `insert into student_math_set_attempts (
+       student_id, chapter_id, question_set_id, score_percent,
+       correct_count, total_questions, submitted_at
+     ) values (?, ?, ?, ?, ?, ?, utc_timestamp())`,
+    [studentId, chapterId, setId, scorePercent, correctCount, totalQuestions],
+  );
+
+  const attemptId = (insertedAttempt as InsertResult).insertId;
+
+  for (const question of gradedQuestions) {
+    await pool.query(
+      `insert into student_math_question_attempts (
+         set_attempt_id, student_id, chapter_id, question_set_id, question_id,
+         selected_option, is_correct, created_at
+       ) values (?, ?, ?, ?, ?, ?, ?, utc_timestamp())`,
+      [
+        attemptId,
+        studentId,
+        chapterId,
+        setId,
+        question.questionId,
+        question.selectedOption,
+        question.isCorrect ? 1 : 0,
+      ],
+    );
+  }
+
+  await pool.query(
+    `insert into student_math_chapter_progress (
+       student_id, chapter_id, learn_status, learn_completed_at, last_activity_at
+     ) values (?, ?, 'learning', null, utc_timestamp())
+     on duplicate key update
+       learn_status = case
+         when learn_status = 'completed' then 'completed'
+         else 'learning'
+       end,
+       last_activity_at = values(last_activity_at)`,
+    [studentId, chapterId],
+  );
+
+  return {
+    ok: true as const,
+    result: {
+      attemptId,
+      chapterId,
+      chapterTitle: questionSet.chapterTitle,
+      setId,
+      setTitle: questionSet.title,
+      scorePercent,
+      correctCount,
+      totalQuestions,
+      submittedAt: new Date().toISOString(),
+      questions: gradedQuestions,
+    } satisfies MathQuestionSetAttemptResult,
+  };
+}
+
 export async function getHistoryEvaluationOverview(studentId: number) {
   await ensureHistoryContentSeeded();
 
@@ -2232,6 +2714,82 @@ export async function getEnglishEvaluationOverview(studentId: number) {
     strongestChapter: attemptedAverages.sort((a, b) => b.average - a.average)[0]?.title ?? null,
     needsAttentionChapter: attemptedAverages.sort((a, b) => a.average - b.average)[0]?.title ?? null,
   } satisfies EnglishEvaluationOverview;
+}
+
+export async function getMathEvaluationOverview(studentId: number) {
+  await ensureMathContentSeeded();
+
+  const [chapterRows] = await pool.query(
+    `select
+       mc.id as chapterId,
+       mc.title,
+       coalesce(mcp.learn_status, 'not_started') as learnStatus
+     from math_chapters mc
+     left join student_math_chapter_progress mcp
+       on mcp.chapter_id = mc.id and mcp.student_id = ?
+     order by mc.sort_order asc`,
+    [studentId],
+  );
+
+  const [attemptRows] = await pool.query(
+    `select chapter_id as chapterId, score_percent as scorePercent
+     from student_math_set_attempts
+     where student_id = ?`,
+    [studentId],
+  );
+
+  const [setCountRows] = await pool.query(
+    "select count(*) as totalSets from math_question_sets",
+  );
+
+  const chapters = chapterRows as Array<{
+    chapterId: string;
+    title: string;
+    learnStatus: HistoryLearnStatus;
+  }>;
+  const attempts = attemptRows as Array<{
+    chapterId: string;
+    scorePercent: number;
+  }>;
+  const totalSets = Number((setCountRows as Array<{ totalSets: number }>)[0]?.totalSets ?? 0);
+
+  const scoreByChapter = new Map<string, number[]>();
+  for (const attempt of attempts) {
+    const current = scoreByChapter.get(attempt.chapterId) ?? [];
+    current.push(Number(attempt.scorePercent));
+    scoreByChapter.set(attempt.chapterId, current);
+  }
+
+  const chapterAverages = chapters.map((chapter) => {
+    const scores = scoreByChapter.get(chapter.chapterId) ?? [];
+    const average =
+      scores.length > 0
+        ? scores.reduce((sum, score) => sum + score, 0) / scores.length
+        : null;
+    return { title: chapter.title, average };
+  });
+
+  const attemptedAverages = chapterAverages.filter(
+    (chapter) => chapter.average !== null,
+  ) as Array<{ title: string; average: number }>;
+
+  return {
+    completedLearningChapters: chapters.filter((chapter) => chapter.learnStatus === "completed").length,
+    totalChapters: chapters.length,
+    attemptedSets: attempts.length,
+    totalSets,
+    averageScore:
+      attempts.length > 0
+        ? Number(
+            (
+              attempts.reduce((sum, attempt) => sum + Number(attempt.scorePercent), 0) /
+              attempts.length
+            ).toFixed(1),
+          )
+        : null,
+    strongestChapter: attemptedAverages.sort((a, b) => b.average - a.average)[0]?.title ?? null,
+    needsAttentionChapter: attemptedAverages.sort((a, b) => a.average - b.average)[0]?.title ?? null,
+  } satisfies MathEvaluationOverview;
 }
 
 export async function getHistoryChapterEvaluation(
@@ -2487,4 +3045,87 @@ export async function getEnglishChapterEvaluation(
     lastScore: attempts.length > 0 ? Number(attempts[0].scorePercent) : null,
     setResults: groupedBySet,
   } satisfies EnglishChapterEvaluation;
+}
+
+export async function getMathChapterEvaluation(
+  studentId: number,
+  chapterId: string,
+) {
+  await ensureMathContentSeeded();
+
+  const chapter = await getMathChapterByIdFromDb(chapterId);
+  if (!chapter) {
+    return null;
+  }
+
+  const [progressRows] = await pool.query(
+    `select
+       chapter_id as chapterId,
+       learn_status as learnStatus,
+       learn_completed_at as learnCompletedAt,
+       last_activity_at as lastActivityAt
+     from student_math_chapter_progress
+     where student_id = ? and chapter_id = ?
+     limit 1`,
+    [studentId, chapterId],
+  );
+
+  const [attemptRows] = await pool.query(
+    `select
+       a.id,
+       a.chapter_id as chapterId,
+       a.question_set_id as questionSetId,
+       s.title as setTitle,
+       a.score_percent as scorePercent,
+       a.correct_count as correctCount,
+       a.total_questions as totalQuestions,
+       a.submitted_at as submittedAt
+     from student_math_set_attempts a
+     join math_question_sets s on s.id = a.question_set_id
+     where a.student_id = ? and a.chapter_id = ?
+     order by a.submitted_at desc`,
+    [studentId, chapterId],
+  );
+
+  const progress = (progressRows as ChapterProgressRow[])[0];
+  const attempts = attemptRows as SetAttemptRow[];
+
+  const groupedBySet = chapter.questionSets.map((set) => {
+    const setAttempts = attempts.filter((attempt) => attempt.questionSetId === set.id);
+    return {
+      setId: set.id,
+      setTitle: set.title,
+      attempts: setAttempts.length,
+      bestScore:
+        setAttempts.length > 0
+          ? Math.max(...setAttempts.map((attempt) => Number(attempt.scorePercent)))
+          : null,
+      latestScore: setAttempts.length > 0 ? Number(setAttempts[0].scorePercent) : null,
+      lastSubmittedAt: toIsoOrNull(setAttempts[0]?.submittedAt ?? null),
+      attemptHistory: buildAttemptHistory(setAttempts),
+    };
+  });
+
+  return {
+    chapterId,
+    learnStatus: progress?.learnStatus ?? "not_started",
+    learnCompletedAt: toIsoOrNull(progress?.learnCompletedAt ?? null),
+    lastActivityAt:
+      toIsoOrNull(progress?.lastActivityAt ?? null) ?? toIsoOrNull(attempts[0]?.submittedAt ?? null),
+    attemptedSets: groupedBySet.filter((set) => set.attempts > 0).length,
+    totalSets: chapter.questionSets.length,
+    averageScore:
+      attempts.length > 0
+        ? Number(
+            (
+              attempts.reduce((sum, attempt) => sum + Number(attempt.scorePercent), 0) /
+              attempts.length
+            ).toFixed(1),
+          )
+        : null,
+    bestScore:
+      attempts.length > 0 ? Math.max(...attempts.map((attempt) => Number(attempt.scorePercent))) : null,
+    lastScore: attempts.length > 0 ? Number(attempts[0].scorePercent) : null,
+    setResults: groupedBySet,
+  } satisfies MathChapterEvaluation;
 }

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   gradeOptions as grades,
   subjectCatalog as subjects,
-  supportedGrade,
+  supportedGrades,
 } from "@/lib/study-catalog";
 
 type Props = {
@@ -58,8 +58,8 @@ export function StudyPreferencesForm({ initialGrade, initialSubject }: Props) {
           onChange={(event) => setCurrentGrade(event.target.value)}
         >
           {grades.map((grade) => (
-            <option key={grade} disabled={grade !== supportedGrade} value={grade}>
-              {grade === supportedGrade
+            <option key={grade} disabled={!supportedGrades.includes(grade as 6 | 7 | 8 | 9)} value={grade}>
+              {supportedGrades.includes(grade as 6 | 7 | 8 | 9)
                 ? `Lớp ${grade}`
                 : `Lớp ${grade} - Chưa khả dụng`}
             </option>
