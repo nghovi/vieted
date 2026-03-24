@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+FALLBACK_ENV="$HOME/ch_data_fetcher/.env"
+
 export PATH="$HOME/local/node-v18.18.0-linux-x64-glibc-217/bin:$PATH"
 export NODE_ENV=production
 export PORT="${PORT:-3010}"
@@ -10,6 +12,13 @@ export DB_PORT="${DB_PORT:-3306}"
 export DB_DATABASE="${DB_DATABASE:-vieted}"
 export DB_USERNAME="${DB_USERNAME:-admin}"
 export DB_PASSWORD="${DB_PASSWORD:-}"
+
+if [[ -z "$DB_PASSWORD" && -f "$FALLBACK_ENV" ]]; then
+  set -a
+  source "$FALLBACK_ENV"
+  set +a
+  export DB_PASSWORD="${DB_PASSWORD:-}"
+fi
 
 if [[ -z "$DB_PASSWORD" ]]; then
   echo "DB_PASSWORD is missing in /home/centos/apps/vieted/apps/web/.env.production"

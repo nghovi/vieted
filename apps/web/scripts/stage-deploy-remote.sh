@@ -2,6 +2,7 @@
 set -euo pipefail
 
 APP_DIR="/home/centos/apps/vieted"
+FALLBACK_ENV="$HOME/ch_data_fetcher/.env"
 NODE_BIN="$HOME/local/node-v18.18.0-linux-x64-glibc-217/bin/node"
 NPM_CLI="$HOME/local/node-v18.18.0-linux-x64-glibc-217/lib/node_modules/npm/bin/npm-cli.js"
 REPO_URL="git@github.com:nghovi/vieted.git"
@@ -65,6 +66,12 @@ if [[ -f "$APP_DIR/apps/web/.env.production" ]]; then
   set +a
 fi
 
+if [[ -z "${DB_PASSWORD:-}" && -f "$FALLBACK_ENV" ]]; then
+  set -a
+  source "$FALLBACK_ENV"
+  set +a
+fi
+
 export PATH="$HOME/local/node-v18.18.0-linux-x64-glibc-217/bin:$PATH"
 export DB_HOST="${DB_HOST:-cfd.c7hvdub23zsh.ap-southeast-1.rds.amazonaws.com}"
 export DB_PORT="${DB_PORT:-3306}"
@@ -75,6 +82,12 @@ export DB_PASSWORD="${DB_PASSWORD:-}"
 if [[ -z "$DB_PASSWORD" ]]; then
   echo "DB_PASSWORD is missing in $APP_DIR/apps/web/.env.production"
   exit 1
+fi
+
+if grep -q '^DB_PASSWORD=' "$APP_DIR/apps/web/.env.production"; then
+  perl -0pi -e "s/^DB_PASSWORD=.*$/DB_PASSWORD=$ENV{DB_PASSWORD}/m" "$APP_DIR/apps/web/.env.production"
+else
+  printf '\nDB_PASSWORD=%s\n' "$DB_PASSWORD" >> "$APP_DIR/apps/web/.env.production"
 fi
 
 "$NODE_BIN" "$NPM_CLI" install
