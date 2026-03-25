@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import {
+  buildPublicUrl,
   getSessionCookieName,
   getTikTokAuthConfig,
   getTikTokOauthStateCookieName,
@@ -81,8 +82,8 @@ async function fetchTikTokUser(accessToken: string) {
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
-  const loginUrl = new URL("/login", request.url);
-  const homeUrl = new URL("/", request.url);
+  const loginUrl = buildPublicUrl(request, "/login");
+  const homeUrl = buildPublicUrl(request, "/");
   const code = url.searchParams.get("code") ?? "";
   const state = url.searchParams.get("state") ?? "";
   const error = url.searchParams.get("error") ?? "";

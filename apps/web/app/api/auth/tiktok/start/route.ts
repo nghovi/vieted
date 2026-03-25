@@ -1,13 +1,14 @@
 import crypto from "node:crypto";
 import { NextResponse } from "next/server";
 import {
+  buildPublicUrl,
   buildTikTokAuthorizeUrl,
   getTikTokAuthConfig,
   getTikTokOauthStateCookieName,
 } from "@/lib/auth";
 
 export async function GET(request: Request) {
-  const loginUrl = new URL("/login", request.url);
+  const loginUrl = buildPublicUrl(request, "/login");
 
   if (!getTikTokAuthConfig()) {
     loginUrl.searchParams.set("socialError", "tiktok_config");

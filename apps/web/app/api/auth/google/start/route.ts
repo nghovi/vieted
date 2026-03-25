@@ -1,13 +1,14 @@
 import crypto from "node:crypto";
 import { NextResponse } from "next/server";
 import {
+  buildPublicUrl,
   buildGoogleAuthorizeUrl,
   getGoogleAuthConfig,
   getGoogleOauthStateCookieName,
 } from "@/lib/auth";
 
 export async function GET(request: Request) {
-  const loginUrl = new URL("/login", request.url);
+  const loginUrl = buildPublicUrl(request, "/login");
 
   if (!getGoogleAuthConfig()) {
     loginUrl.searchParams.set("socialError", "google_config");

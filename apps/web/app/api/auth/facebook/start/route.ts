@@ -1,13 +1,14 @@
 import crypto from "node:crypto";
 import { NextResponse } from "next/server";
 import {
+  buildPublicUrl,
   buildFacebookAuthorizeUrl,
   getFacebookAuthConfig,
   getFacebookOauthStateCookieName,
 } from "@/lib/auth";
 
 export async function GET(request: Request) {
-  const loginUrl = new URL("/login", request.url);
+  const loginUrl = buildPublicUrl(request, "/login");
 
   if (!getFacebookAuthConfig()) {
     loginUrl.searchParams.set("socialError", "facebook_config");

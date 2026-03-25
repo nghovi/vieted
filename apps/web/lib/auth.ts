@@ -113,6 +113,32 @@ export function getGoogleOauthStateCookieName() {
   return googleOauthStateCookieName;
 }
 
+export function getPublicOrigin(request: Request) {
+  const configuredOrigin =
+    process.env.NEXT_PUBLIC_APP_URL?.trim() ||
+    process.env.APP_BASE_URL?.trim() ||
+    process.env.NEXTAUTH_URL?.trim() ||
+    "";
+
+  if (configuredOrigin) {
+    return configuredOrigin.replace(/\/+$/, "");
+  }
+
+  const forwardedHost = request.headers.get("x-forwarded-host")?.trim() ?? "";
+  const forwardedProto = request.headers.get("x-forwarded-proto")?.trim() ?? "";
+
+  if (forwardedHost && forwardedProto) {
+    return `${forwardedProto}://${forwardedHost}`;
+  }
+
+  const url = new URL(request.url);
+  return url.origin;
+}
+
+export function buildPublicUrl(request: Request, path: string) {
+  return new URL(path, `${getPublicOrigin(request)}/`);
+}
+
 export function getFacebookAuthConfig() {
   const appId = process.env.FACEBOOK_APP_ID?.trim() ?? "";
   const appSecret = process.env.FACEBOOK_APP_SECRET?.trim() ?? "";
