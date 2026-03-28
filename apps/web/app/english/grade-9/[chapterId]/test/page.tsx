@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getServerSessionStudent } from "@/lib/auth";
 import {
+  canStudentAccessEnglishChapter,
   getEnglishChapterByIdFromDb,
   getEnglishChapterEvaluation,
   listEnglishQuestionSetsWithProgress,
@@ -16,6 +17,8 @@ export default async function EnglishChapterTestPage({ params }: Props) {
   const { chapterId } = await params;
   const student = await getServerSessionStudent();
   if (!student) redirect("/login");
+  const access = await canStudentAccessEnglishChapter(student.dbId, chapterId);
+  if (!access?.isUnlocked) redirect("/");
 
   const chapter = await getEnglishChapterByIdFromDb(chapterId);
   const testSets = await listEnglishQuestionSetsWithProgress(student.dbId, chapterId);

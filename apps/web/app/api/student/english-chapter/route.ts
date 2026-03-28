@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSessionStudent } from "@/lib/auth";
-import { saveStudentEnglishChapter } from "@/lib/db";
+import { canStudentAccessEnglishChapter, saveStudentEnglishChapter } from "@/lib/db";
 import { getEnglishChapterById } from "@/lib/english-grade-9";
 
 export async function POST(request: Request) {
@@ -14,6 +14,11 @@ export async function POST(request: Request) {
 
   if (typeof body.chapterId !== "string" || !getEnglishChapterById(body.chapterId)) {
     return NextResponse.json({ error: "Bài học không hợp lệ." }, { status: 400 });
+  }
+
+  const access = await canStudentAccessEnglishChapter(student.dbId, body.chapterId);
+  if (!access?.isUnlocked) {
+    return NextResponse.json({ error: "Bài học này chưa được mở khóa." }, { status: 403 });
   }
 
   await saveStudentEnglishChapter(student.dbId, body.chapterId);

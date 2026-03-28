@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920">
+  <defs>
+    <linearGradient id="bg-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fbf7ef"/>
+      <stop offset="100%" stop-color="#f1eadf"/>
+    </linearGradient>
+    <linearGradient id="local-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#edf8ee"/>
+      <stop offset="100%" stop-color="#fff7ee"/>
+    </linearGradient>
+    <linearGradient id="city-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#edf4ff"/>
+      <stop offset="100%" stop-color="#fff8f0"/>
+    </linearGradient>
+    <linearGradient id="health-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f1fbe9"/>
+      <stop offset="100%" stop-color="#fff8ef"/>
+    </linearGradient>
+    <linearGradient id="past-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f4e3cc"/>
+      <stop offset="100%" stop-color="#fff7eb"/>
+    </linearGradient>
+    <linearGradient id="exp-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff0df"/>
+      <stop offset="100%" stop-color="#f7fbff"/>
+    </linearGradient>
+  </defs>
+  <rect width="1080" height="1920" fill="url(#bg-grad)"/>
+  <circle cx="180" cy="110" r="160" fill="rgba(219,107,45,0.09)"/>
+  <circle cx="930" cy="1760" r="180" fill="rgba(31,143,107,0.08)"/>
+  <text x="88" y="110" fill="#1f8f6b" font-size="26" font-weight="700" letter-spacing="6" font-family="Georgia, 'Times New Roman', serif">TRƯỜNG ĐIỂM TA9</text>
+  
+        <text x="88" y="210" fill="#163127" font-size="72" font-weight="600" font-family="Georgia, 'Times New Roman', serif"><tspan x="88" dy="0">Unit 2. City</tspan><tspan x="88" dy="97.2">Life</tspan></text>
+        <text x="88" y="360" fill="#5d6f68" font-size="34" font-weight="500" font-family="Georgia, 'Times New Roman', serif">Học từ vựng, so sánh, giao thông và cách nói về ưu nhược điểm của cuộc sống thành phố.</text>
+        <rect x="64" y="470" width="952" height="320" rx="34" fill="#fffaf1" stroke="rgba(22,49,39,0.1)" stroke-width="2"/>
+          <text x="104" y="548" fill="#1f8f6b" font-size="24" font-weight="700" letter-spacing="4" font-family="Georgia, 'Times New Roman', serif">THÔNG TIN UNIT</text>
+          <text x="104" y="630" fill="#163127" font-size="34" font-weight="700" font-family="Georgia, 'Times New Roman', serif">4 ý chính • 3 bộ luyện • 1 bộ chốt cấp độ</text>
+          <text x="104" y="690" fill="#5d6f68" font-size="28" font-weight="500" font-family="Georgia, 'Times New Roman', serif">Tiếp tục học theo từng bước, rồi sang kiểm tra để biết mình còn yếu ở đâu.</text>
+        
+        
+    <rect x="88" y="856" width="240" height="92" rx="30" fill="#db6b2d" stroke="none" stroke-width="2"/>
+    <text x="208" y="911" text-anchor="middle" fill="#fff9f2" font-size="30" font-weight="700" font-family="Georgia, 'Times New Roman', serif">Học</text>
+  
+        
+    <rect x="352" y="856" width="260" height="92" rx="30" fill="rgba(255,250,241,0.88)" stroke="rgba(22,49,39,0.12)" stroke-width="2"/>
+    <text x="482" y="911" text-anchor="middle" fill="#163127" font-size="30" font-weight="700" font-family="Georgia, 'Times New Roman', serif">Kiểm tra</text>
+  
+        
+    <rect x="636" y="856" width="280" height="92" rx="30" fill="rgba(255,250,241,0.88)" stroke="rgba(22,49,39,0.12)" stroke-width="2"/>
+    <text x="776" y="911" text-anchor="middle" fill="#163127" font-size="30" font-weight="700" font-family="Georgia, 'Times New Roman', serif">Đánh giá</text>
+  
+        <rect x="64" y="1010" width="952" height="600" rx="34" fill="#fffaf1" stroke="rgba(22,49,39,0.1)" stroke-width="2"/>
+          <text x="104" y="1088" fill="#1f8f6b" font-size="24" font-weight="700" letter-spacing="4" font-family="Georgia, 'Times New Roman', serif">LỘ TRÌNH BÀI HỌC</text>
+          <rect x="104" y="1144" width="872" height="94" rx="26" fill="url(#city-grad)"/>
+          <rect x="104" y="1260" width="872" height="94" rx="26" fill="rgba(255,250,241,0.88)"/>
+          <rect x="104" y="1376" width="872" height="94" rx="26" fill="rgba(255,250,241,0.88)"/>
+          <text x="140" y="1200" fill="#163127" font-size="30" font-weight="700" font-family="Georgia, 'Times New Roman', serif">1. Từ vựng và chủ điểm thành phố</text>
+          <text x="140" y="1316" fill="#163127" font-size="30" font-weight="700" font-family="Georgia, 'Times New Roman', serif">2. So sánh và nêu quan điểm</text>
+          <text x="140" y="1432" fill="#163127" font-size="30" font-weight="700" font-family="Georgia, 'Times New Roman', serif">3. Ôn tập và vượt bài chốt</text>
+        
+      
+</svg>

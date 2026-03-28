@@ -33,7 +33,7 @@ Both clients should consume the same backend APIs and share the same curriculum,
 
 - Each student can save a current grade from 1 to 12
 - Each student can choose the subject they want to study next
-- The first supported learning path should be grade 9 history
+- The first focused learning path should be grade 9 English
 - The saved study context should drive lesson recommendations, quizzes, and review queues
 
 ### 1. Curriculum service
@@ -190,4 +190,4 @@ Use system prompts that enforce:
 
 ## Recommendation
 
-The fastest path is to build a narrow but polished MVP around one subject and one grade band instead of a broad multi-subject platform. That gives you better content quality, simpler measurement, and a much stronger learning loop.
+The fastest path is to build a narrow but polished MVP around grade 9 English instead of a broad multi-subject platform. That gives you better content quality, simpler measurement, and a much stronger learning loop.

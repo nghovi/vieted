@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920">
+  <defs>
+    <linearGradient id="bg-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fbf7ef"/>
+      <stop offset="100%" stop-color="#f1eadf"/>
+    </linearGradient>
+    <linearGradient id="local-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#edf8ee"/>
+      <stop offset="100%" stop-color="#fff7ee"/>
+    </linearGradient>
+    <linearGradient id="city-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#edf4ff"/>
+      <stop offset="100%" stop-color="#fff8f0"/>
+    </linearGradient>
+    <linearGradient id="health-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f1fbe9"/>
+      <stop offset="100%" stop-color="#fff8ef"/>
+    </linearGradient>
+    <linearGradient id="past-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f4e3cc"/>
+      <stop offset="100%" stop-color="#fff7eb"/>
+    </linearGradient>
+    <linearGradient id="exp-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff0df"/>
+      <stop offset="100%" stop-color="#f7fbff"/>
+    </linearGradient>
+  </defs>
+  <rect width="1080" height="1920" fill="url(#bg-grad)"/>
+  <circle cx="180" cy="110" r="160" fill="rgba(219,107,45,0.09)"/>
+  <circle cx="930" cy="1760" r="180" fill="rgba(31,143,107,0.08)"/>
+  <text x="88" y="110" fill="#1f8f6b" font-size="26" font-weight="700" letter-spacing="6" font-family="Georgia, 'Times New Roman', serif">TRƯỜNG ĐIỂM TA9</text>
+  
+        <text x="88" y="210" fill="#163127" font-size="64" font-weight="600" font-family="Georgia, 'Times New Roman', serif"><tspan x="88" dy="0">Ôn lại đúng kỹ</tspan><tspan x="88" dy="86.4">năng đến hạn để</tspan><tspan x="88" dy="86.4">nhớ chắc hơn mỗi</tspan><tspan x="88" dy="86.4">ngày.</tspan></text>
+        <rect x="64" y="440" width="952" height="1240" rx="34" fill="#fffaf1" stroke="rgba(22,49,39,0.1)" stroke-width="2"/>
+          <text x="104" y="520" fill="#1f8f6b" font-size="24" font-weight="700" letter-spacing="4" font-family="Georgia, 'Times New Roman', serif">ÔN TẬP THEO SRS</text>
+          <rect x="104" y="590" width="872" height="260" rx="30" fill="url(#city-grad)"/>
+          <text x="144" y="670" fill="#163127" font-size="34" font-weight="700" font-family="Georgia, 'Times New Roman', serif">Cấu trúc câu</text>
+          <text x="144" y="726" fill="#5d6f68" font-size="28" font-weight="500" font-family="Georgia, 'Times New Roman', serif">Chu kỳ hiện tại: 3 ngày • số lần nhớ lại: 2</text>
+          <text x="144" y="782" fill="#5d6f68" font-size="28" font-weight="500" font-family="Georgia, 'Times New Roman', serif">Em đã trả lời đúng nhưng cần củng cố thêm.</text>
+          <rect x="104" y="892" width="872" height="260" rx="30" fill="url(#health-grad)"/>
+          <text x="144" y="972" fill="#163127" font-size="34" font-weight="700" font-family="Georgia, 'Times New Roman', serif">Đọc hiểu</text>
+          <text x="144" y="1028" fill="#5d6f68" font-size="28" font-weight="500" font-family="Georgia, 'Times New Roman', serif">Chu kỳ hiện tại: 1 ngày • số lần nhớ lại: 0</text>
+          <text x="144" y="1084" fill="#5d6f68" font-size="28" font-weight="500" font-family="Georgia, 'Times New Roman', serif">Em vẫn còn nhầm ở kỹ năng này.</text>
+          <rect x="104" y="1194" width="872" height="380" rx="30" fill="rgba(255,250,241,0.88)"/>
+          <text x="144" y="1274" fill="#163127" font-size="34" font-weight="700" font-family="Georgia, 'Times New Roman', serif">Gợi ý cho hôm nay</text>
+          <text x="144" y="1346" fill="#5d6f68" font-size="28" font-weight="500" font-family="Georgia, 'Times New Roman', serif">Ôn 2 kỹ năng đến hạn rồi làm lại 1 bộ ngắn để củng cố.</text>
+        
+        
+    <rect x="680" y="1728" width="296" height="96" rx="30" fill="#db6b2d" stroke="none" stroke-width="2"/>
+    <text x="828" y="1785" text-anchor="middle" fill="#fff9f2" font-size="30" font-weight="700" font-family="Georgia, 'Times New Roman', serif">Vào làm bài ôn</text>
+  
+      
+</svg>

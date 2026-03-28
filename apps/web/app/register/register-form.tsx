@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export function RegisterForm() {
+  const showOtpPreview = process.env.NODE_ENV !== "production";
   const router = useRouter();
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
@@ -176,7 +177,7 @@ export function RegisterForm() {
           </label>
 
           {otpMessage ? <p className="form-success">{otpMessage}</p> : null}
-          {otpPreview ? (
+          {showOtpPreview && otpPreview ? (
             <p className="helper-copy">Mã OTP thử nghiệm trên máy local: <strong>{otpPreview}</strong></p>
           ) : null}
         </div>

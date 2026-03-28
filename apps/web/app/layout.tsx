@@ -30,15 +30,8 @@ export default async function RootLayout({
           </Link>
           {student ? (
             <Link href="/profile" className="floating-profile-link" aria-label="Mở hồ sơ">
-              <span
-                className="floating-profile-avatar"
-                aria-hidden="true"
-                style={{
-                  background: student.avatar.background,
-                  color: student.avatar.accent,
-                }}
-              >
-                {student.avatar.emoji}
+              <span className="floating-home-icon" aria-hidden="true">
+                ☰
               </span>
               <span className="floating-profile-label">Hồ sơ</span>
             </Link>

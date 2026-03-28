@@ -3,11 +3,11 @@ import Link from "next/link";
 const policySections = [
   {
     title: "1. Phạm vi áp dụng",
-    body: "Chính sách quyền riêng tư này áp dụng cho website và ứng dụng di động của TruongHoc tại truonghoc.online, bao gồm các chức năng đăng nhập, học tập, làm bài kiểm tra, theo dõi tiến độ và quản lý hồ sơ học sinh.",
+    body: "Chính sách quyền riêng tư này áp dụng cho ứng dụng Trường điểm - Tiếng Anh 9 và website Trường Điểm Online tại truongdiem.online, bao gồm các chức năng đăng nhập, học tập, làm bài kiểm tra, theo dõi tiến độ và quản lý hồ sơ học sinh.",
   },
   {
     title: "2. Dữ liệu được thu thập",
-    body: "TruongHoc có thể thu thập và lưu trữ các dữ liệu cần thiết để vận hành dịch vụ, bao gồm số điện thoại đăng nhập, mật khẩu đã mã hóa, biệt danh, ảnh đại diện, lớp học, môn học, chương học đã chọn, lịch sử học tập, kết quả kiểm tra và các dữ liệu kỹ thuật phục vụ bảo mật và vận hành hệ thống.",
+    body: "Trường điểm - Tiếng Anh 9 có thể thu thập và lưu trữ các dữ liệu cần thiết để vận hành dịch vụ, bao gồm số điện thoại đăng nhập, mật khẩu đã mã hóa, biệt danh, ảnh đại diện, lớp học, môn học, chương học đã chọn, lịch sử học tập, kết quả kiểm tra và các dữ liệu kỹ thuật phục vụ bảo mật và vận hành hệ thống.",
   },
   {
     title: "3. Mục đích xử lý dữ liệu",
@@ -15,15 +15,15 @@ const policySections = [
   },
   {
     title: "4. Cơ sở và cách thức sử dụng",
-    body: "TruongHoc chỉ xử lý dữ liệu trong phạm vi cần thiết để cung cấp dịch vụ học tập và vận hành tài khoản. Dữ liệu không được sử dụng cho mục đích ngoài phạm vi dịch vụ nếu chưa có căn cứ phù hợp hoặc chưa có thông báo bổ sung tới người dùng.",
+    body: "Trường điểm - Tiếng Anh 9 chỉ xử lý dữ liệu trong phạm vi cần thiết để cung cấp dịch vụ học tập và vận hành tài khoản. Dữ liệu không được sử dụng cho mục đích ngoài phạm vi dịch vụ nếu chưa có căn cứ phù hợp hoặc chưa có thông báo bổ sung tới người dùng.",
   },
   {
     title: "5. Bảo mật thông tin",
-    body: "TruongHoc áp dụng các biện pháp kỹ thuật và tổ chức phù hợp để bảo vệ dữ liệu người dùng, bao gồm mã hóa mật khẩu, kiểm soát phiên đăng nhập và giới hạn truy cập dữ liệu. Tuy vậy, không có hệ thống nào bảo đảm an toàn tuyệt đối, vì vậy người dùng cần bảo mật thông tin đăng nhập của mình.",
+    body: "Trường điểm - Tiếng Anh 9 áp dụng các biện pháp kỹ thuật và tổ chức phù hợp để bảo vệ dữ liệu người dùng, bao gồm mã hóa mật khẩu, kiểm soát phiên đăng nhập và giới hạn truy cập dữ liệu. Tuy vậy, không có hệ thống nào bảo đảm an toàn tuyệt đối, vì vậy người dùng cần bảo mật thông tin đăng nhập của mình.",
   },
   {
     title: "6. Chia sẻ dữ liệu",
-    body: "TruongHoc không bán dữ liệu cá nhân của học sinh. Dữ liệu chỉ được chia sẻ trong phạm vi cần thiết để lưu trữ, bảo trì, bảo mật, vận hành hệ thống hoặc đáp ứng yêu cầu pháp lý hợp lệ.",
+    body: "Trường điểm - Tiếng Anh 9 không bán dữ liệu cá nhân của học sinh. Dữ liệu chỉ được chia sẻ trong phạm vi cần thiết để lưu trữ, bảo trì, bảo mật, vận hành hệ thống hoặc đáp ứng yêu cầu pháp lý hợp lệ.",
   },
   {
     title: "7. Lưu trữ dữ liệu",
@@ -31,7 +31,7 @@ const policySections = [
   },
   {
     title: "8. Quyền của người dùng",
-    body: "Người dùng có thể xem, cập nhật một số thông tin hồ sơ như biệt danh, ảnh đại diện và mật khẩu trong phần Hồ sơ. Khi cần hỗ trợ thêm về tài khoản hoặc dữ liệu, người dùng có thể liên hệ qua truonghoc.online.",
+    body: "Người dùng có thể xem, cập nhật mật khẩu và quản lý tài khoản trong phần Hồ sơ. Khi cần hỗ trợ thêm về tài khoản hoặc dữ liệu, người dùng có thể liên hệ qua support@truongdiem.online.",
   },
   {
     title: "9. Dữ liệu học tập",
@@ -39,7 +39,7 @@ const policySections = [
   },
   {
     title: "10. Thay đổi chính sách",
-    body: "TruongHoc có thể cập nhật chính sách này theo thời gian để phản ánh thay đổi về sản phẩm, công nghệ hoặc yêu cầu pháp lý. Phiên bản mới nhất sẽ được đăng tại trang này và có hiệu lực kể từ thời điểm được công bố.",
+    body: "Trường điểm - Tiếng Anh 9 có thể cập nhật chính sách này theo thời gian để phản ánh thay đổi về sản phẩm, công nghệ hoặc yêu cầu pháp lý. Phiên bản mới nhất sẽ được đăng tại trang này và có hiệu lực kể từ thời điểm được công bố.",
   },
 ] as const;
 
@@ -49,10 +49,11 @@ export default function PrivacyPage() {
       <section className="hero auth-hero">
         <div className="hero-copy">
           <p className="eyebrow">Chính sách quyền riêng tư</p>
-          <h1>Chính sách quyền riêng tư dành cho website và ứng dụng của TruongHoc.</h1>
+          <h1>Chính sách quyền riêng tư dành cho ứng dụng Trường điểm - Tiếng Anh 9.</h1>
           <p className="lede">
-            Trang này mô tả cách TruongHoc thu thập, sử dụng, lưu trữ và bảo vệ dữ liệu
-            của học sinh và người dùng khi sử dụng dịch vụ tại truonghoc.online.
+            Trang này mô tả cách Trường điểm - Tiếng Anh 9 thu thập, sử dụng, lưu trữ
+            và bảo vệ dữ liệu của học sinh và người dùng khi sử dụng dịch vụ tại
+            truongdiem.online.
           </p>
           <div className="hero-actions">
             <Link href="/login" className="secondary-link">
@@ -68,8 +69,8 @@ export default function PrivacyPage() {
           <h2>Thông tin chính</h2>
           <ul>
             <li>
-              <span>Đơn vị dịch vụ</span>
-              <strong>TruongHoc tại truonghoc.online</strong>
+              <span>Ứng dụng</span>
+              <strong>Trường điểm - Tiếng Anh 9</strong>
             </li>
             <li>
               <span>Dữ liệu tài khoản</span>
@@ -78,6 +79,10 @@ export default function PrivacyPage() {
             <li>
               <span>Dữ liệu học tập</span>
               <strong>Lớp học, môn học, chương học, kết quả và tiến độ</strong>
+            </li>
+            <li>
+              <span>Liên hệ</span>
+              <strong>support@truongdiem.online</strong>
             </li>
             <li>
               <span>Cập nhật</span>

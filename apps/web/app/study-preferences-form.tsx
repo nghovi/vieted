@@ -65,7 +65,6 @@ export function StudyPreferencesForm({ initialGrade, initialSubject }: Props) {
             </option>
           ))}
         </select>
-        <span className="helper-copy">Chọn lớp học phù hợp với hồ sơ học tập của em.</span>
       </label>
 
       <label className="field">
@@ -86,7 +85,6 @@ export function StudyPreferencesForm({ initialGrade, initialSubject }: Props) {
             </option>
           ))}
         </select>
-        <span className="helper-copy">Môn học đang học sẽ được lưu trong tài khoản của em.</span>
       </label>
 
       <button className="primary-link auth-submit" disabled={isSaving} type="submit">

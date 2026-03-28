@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920">
+  <defs>
+    <linearGradient id="bg-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fbf7ef"/>
+      <stop offset="100%" stop-color="#f1eadf"/>
+    </linearGradient>
+    <linearGradient id="local-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#edf8ee"/>
+      <stop offset="100%" stop-color="#fff7ee"/>
+    </linearGradient>
+    <linearGradient id="city-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#edf4ff"/>
+      <stop offset="100%" stop-color="#fff8f0"/>
+    </linearGradient>
+    <linearGradient id="health-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f1fbe9"/>
+      <stop offset="100%" stop-color="#fff8ef"/>
+    </linearGradient>
+    <linearGradient id="past-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f4e3cc"/>
+      <stop offset="100%" stop-color="#fff7eb"/>
+    </linearGradient>
+    <linearGradient id="exp-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff0df"/>
+      <stop offset="100%" stop-color="#f7fbff"/>
+    </linearGradient>
+  </defs>
+  <rect width="1080" height="1920" fill="url(#bg-grad)"/>
+  <circle cx="180" cy="110" r="160" fill="rgba(219,107,45,0.09)"/>
+  <circle cx="930" cy="1760" r="180" fill="rgba(31,143,107,0.08)"/>
+  <text x="88" y="110" fill="#1f8f6b" font-size="26" font-weight="700" letter-spacing="6" font-family="Georgia, 'Times New Roman', serif">TRƯỜNG ĐIỂM TA9</text>
+  
+        <text x="88" y="210" fill="#163127" font-size="70" font-weight="600" font-family="Georgia, 'Times New Roman', serif"><tspan x="88" dy="0">Mở dần từng unit</tspan><tspan x="88" dy="94.5">để tiến bộ vững</tspan><tspan x="88" dy="94.5">hơn mỗi ngày.</tspan></text>
+        <text x="88" y="430" fill="#5d6f68" font-size="34" font-weight="500" font-family="Georgia, 'Times New Roman', serif">Học đúng trọng tâm, sửa đúng lỗi sai và nhìn rõ tiến độ của em.</text>
+        <rect x="64" y="520" width="952" height="760" rx="34" fill="#fffaf1" stroke="rgba(22,49,39,0.1)" stroke-width="2"/>
+          <text x="104" y="596" fill="#1f8f6b" font-size="24" font-weight="700" letter-spacing="4" font-family="Georgia, 'Times New Roman', serif">BẢN ĐỒ CẤP ĐỘ</text>
+          
+    
+    <g opacity="1">
+      <rect x="96" y="660" width="168" height="148" rx="30" fill="url(#local-grad)" stroke="rgba(22,49,39,0.12)" stroke-width="2"/>
+      <circle cx="130" cy="694" r="18" fill="#73b88b" opacity="0.18"/>
+      <text x="180" y="714" text-anchor="middle" fill="#163127" font-size="24" font-weight="700" font-family="Georgia, 'Times New Roman', serif">Unit 1</text>
+      <text x="180" y="760" text-anchor="middle" fill="#5d6f68" font-size="22" font-weight="600" font-family="Georgia, 'Times New Roman', serif">Đã vượt ải</text>
+    </g>
+  
+          <rect x="264" y="732" width="42" height="4" rx="2" fill="rgba(31,143,107,0.45)"/>
+          
+    <rect x="310" y="652" width="184" height="164" rx="36" fill="none" stroke="rgba(219,107,45,0.35)" stroke-width="4"/>
+    <g opacity="1">
+      <rect x="318" y="660" width="168" height="148" rx="30" fill="url(#city-grad)" stroke="rgba(22,49,39,0.12)" stroke-width="2"/>
+      <circle cx="352" cy="694" r="18" fill="#7b94bf" opacity="0.18"/>
+      <text x="402" y="714" text-anchor="middle" fill="#163127" font-size="24" font-weight="700" font-family="Georgia, 'Times New Roman', serif">Unit 2</text>
+      <text x="402" y="760" text-anchor="middle" fill="#5d6f68" font-size="22" font-weight="600" font-family="Georgia, 'Times New Roman', serif">Đang mở</text>
+    </g>
+  
+          <rect x="486" y="732" width="42" height="4" rx="2" fill="rgba(22,49,39,0.10)"/>
+          
+    
+    <g opacity="0.55">
+      <rect x="540" y="660" width="168" height="148" rx="30" fill="url(#health-grad)" stroke="rgba(22,49,39,0.12)" stroke-width="2"/>
+      <circle cx="574" cy="694" r="18" fill="#8fc96d" opacity="0.18"/>
+      <text x="624" y="714" text-anchor="middle" fill="#163127" font-size="24" font-weight="700" font-family="Georgia, 'Times New Roman', serif">Unit 3</text>
+      <text x="624" y="760" text-anchor="middle" fill="#5d6f68" font-size="22" font-weight="600" font-family="Georgia, 'Times New Roman', serif">Đang khóa</text>
+    </g>
+  
+          <rect x="708" y="732" width="42" height="4" rx="2" fill="rgba(22,49,39,0.10)"/>
+          
+    
+    <g opacity="0.55">
+      <rect x="762" y="660" width="168" height="148" rx="30" fill="url(#past-grad)" stroke="rgba(22,49,39,0.12)" stroke-width="2"/>
+      <circle cx="796" cy="694" r="18" fill="#c09058" opacity="0.18"/>
+      <text x="846" y="714" text-anchor="middle" fill="#163127" font-size="24" font-weight="700" font-family="Georgia, 'Times New Roman', serif">Unit 4</text>
+      <text x="846" y="760" text-anchor="middle" fill="#5d6f68" font-size="22" font-weight="600" font-family="Georgia, 'Times New Roman', serif">Đang khóa</text>
+    </g>
+  
+          
+    
+    <g opacity="0.55">
+      <rect x="430" y="850" width="168" height="148" rx="30" fill="url(#exp-grad)" stroke="rgba(22,49,39,0.12)" stroke-width="2"/>
+      <circle cx="464" cy="884" r="18" fill="#ff9d55" opacity="0.18"/>
+      <text x="514" y="904" text-anchor="middle" fill="#163127" font-size="24" font-weight="700" font-family="Georgia, 'Times New Roman', serif">Unit 5</text>
+      <text x="514" y="950" text-anchor="middle" fill="#5d6f68" font-size="22" font-weight="600" font-family="Georgia, 'Times New Roman', serif">Đang khóa</text>
+    </g>
+  
+          <text x="104" y="1080" fill="#163127" font-size="34" font-weight="700" font-family="Georgia, 'Times New Roman', serif">Unit đang mở: Unit 2. City Life</text>
+          <text x="104" y="1136" fill="#5d6f68" font-size="28" font-weight="500" font-family="Georgia, 'Times New Roman', serif">Hoàn thành bộ ôn tập tổng hợp và đạt 80% ở mọi kỹ năng để mở unit tiếp theo.</text>
+        
+        
+    <rect x="88" y="1336" width="320" height="92" rx="30" fill="#db6b2d" stroke="none" stroke-width="2"/>
+    <text x="248" y="1391" text-anchor="middle" fill="#fff9f2" font-size="30" font-weight="700" font-family="Georgia, 'Times New Roman', serif">Tiếp tục học</text>
+  
+        
+    <rect x="432" y="1336" width="252" height="92" rx="30" fill="rgba(255,250,241,0.88)" stroke="rgba(22,49,39,0.12)" stroke-width="2"/>
+    <text x="558" y="1391" text-anchor="middle" fill="#163127" font-size="30" font-weight="700" font-family="Georgia, 'Times New Roman', serif">Hồ sơ</text>
+  
+      
+</svg>

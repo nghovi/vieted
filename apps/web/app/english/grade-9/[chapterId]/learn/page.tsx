@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { getServerSessionStudent } from "@/lib/auth";
 import {
   getGrade9EnglishChapterEndPage,
   getGrade9EnglishChapterStartPage,
 } from "@/lib/english-textbook";
-import { getEnglishChapterByIdFromDb } from "@/lib/db";
+import { canStudentAccessEnglishChapter, getEnglishChapterByIdFromDb } from "@/lib/db";
 import { TextbookPdfViewer } from "./textbook-pdf-viewer";
 
 type Props = {
@@ -13,6 +14,9 @@ type Props = {
 
 export default async function EnglishLearnPage({ params }: Props) {
   const { chapterId } = await params;
+  const student = await getServerSessionStudent();
+  const access = await canStudentAccessEnglishChapter(student?.dbId ?? null, chapterId);
+  if (!access?.isUnlocked) redirect("/");
   const chapter = await getEnglishChapterByIdFromDb(chapterId);
 
   if (!chapter) notFound();

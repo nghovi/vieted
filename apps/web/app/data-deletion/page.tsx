@@ -3,11 +3,11 @@ import Link from "next/link";
 const deletionSections = [
   {
     title: "1. Cách yêu cầu xóa dữ liệu",
-    body: "Người dùng có thể gửi yêu cầu xóa tài khoản và dữ liệu liên quan bằng cách liên hệ đội ngũ hỗ trợ của Trường Điểm Online và cung cấp số điện thoại đã đăng ký hoặc email/tài khoản mạng xã hội đã liên kết.",
+    body: "Người dùng có thể gửi yêu cầu xóa tài khoản và dữ liệu liên quan của ứng dụng Trường điểm - Tiếng Anh 9 bằng cách liên hệ đội ngũ hỗ trợ của Trường Điểm Online và cung cấp số điện thoại đã đăng ký hoặc email hoặc tài khoản mạng xã hội đã liên kết.",
   },
   {
     title: "2. Dữ liệu sẽ được xóa",
-    body: "Khi yêu cầu xóa được xác nhận, Trường Điểm Online sẽ xóa hồ sơ tài khoản, phương thức đăng nhập đã liên kết, tùy chọn học tập, tiến độ học, kết quả làm bài và các dữ liệu liên quan trực tiếp đến tài khoản đó trong phạm vi hệ thống của chúng tôi.",
+    body: "Khi yêu cầu xóa được xác nhận, Trường Điểm Online sẽ xóa hồ sơ tài khoản, phương thức đăng nhập đã liên kết, tùy chọn học tập, tiến độ học, kết quả làm bài và các dữ liệu liên quan trực tiếp đến tài khoản của ứng dụng Trường điểm - Tiếng Anh 9 trong phạm vi hệ thống của chúng tôi.",
   },
   {
     title: "3. Dữ liệu có thể được giữ lại tạm thời",
@@ -29,10 +29,11 @@ export default function DataDeletionPage() {
       <section className="hero auth-hero">
         <div className="hero-copy">
           <p className="eyebrow">Xóa dữ liệu</p>
-          <h1>Hướng dẫn yêu cầu xóa tài khoản và dữ liệu tại Trường Điểm Online.</h1>
+          <h1>Hướng dẫn yêu cầu xóa dữ liệu của ứng dụng Trường điểm - Tiếng Anh 9.</h1>
           <p className="lede">
             Trang này mô tả cách người dùng có thể yêu cầu xóa tài khoản và dữ liệu cá
-            nhân liên quan khi sử dụng website hoặc ứng dụng của Trường Điểm Online.
+            nhân liên quan khi sử dụng ứng dụng Trường điểm - Tiếng Anh 9 trên hệ
+            thống Trường Điểm Online.
           </p>
           <div className="hero-actions">
             <Link href="/privacy" className="secondary-link">
@@ -57,7 +58,7 @@ export default function DataDeletionPage() {
             </li>
             <li>
               <span>Phạm vi xóa</span>
-              <strong>Hồ sơ tài khoản, tiến độ học và dữ liệu liên quan</strong>
+              <strong>Hồ sơ tài khoản, tiến độ học và dữ liệu liên quan của ứng dụng</strong>
             </li>
             <li>
               <span>Liên hệ</span>

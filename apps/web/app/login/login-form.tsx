@@ -1,11 +1,11 @@
 "use client";
-
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { SocialAuthForm } from "../auth/social-auth-form";
 
 export function LoginForm() {
+  const showPhoneLogin = false;
+  const showOtpPreview = process.env.NODE_ENV !== "production";
   const router = useRouter();
   const searchParams = useSearchParams();
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -181,155 +181,161 @@ export function LoginForm() {
 
   return (
     <div className="auth-stack">
-      <form className="auth-form" onSubmit={handleSubmit}>
-        <label className="field">
-          <span>Số điện thoại</span>
-          <input
-            autoComplete="tel"
-            inputMode="numeric"
-            name="phoneNumber"
-            placeholder="0987654321"
-            value={phoneNumber}
-            onChange={(event) => setPhoneNumber(event.target.value)}
-          />
-        </label>
-
-        <label className="field">
-          <span>Mật khẩu</span>
-          <input
-            autoComplete="current-password"
-            name="password"
-            type="password"
-            placeholder="Ít nhất 8 ký tự"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-          />
-        </label>
-
-        {errorMessage ? <p className="form-error">{errorMessage}</p> : null}
-        {successMessage ? <p className="form-success">{successMessage}</p> : null}
-
-        <button className="primary-link auth-submit" disabled={isSubmitting} type="submit">
-          {isSubmitting ? "Đang xử lý..." : "Đăng nhập bằng số điện thoại"}
-        </button>
-      </form>
-
-      <div className="auth-inline-actions">
-        <button
-          type="button"
-          className="text-action"
-          onClick={() => {
-            setShowForgotPassword((current) => !current);
-            setResetErrorMessage(null);
-            setResetSuccessMessage(null);
-          }}
-        >
-          {showForgotPassword ? "Ẩn phần quên mật khẩu" : "Quên mật khẩu?"}
-        </button>
-      </div>
-
-      {showForgotPassword ? (
-        <form className="auth-form auth-subpanel" onSubmit={handleResetPassword}>
-          <div>
-            <h3>Đặt lại mật khẩu bằng OTP</h3>
-            <p className="helper-copy">
-              Nhập số điện thoại, lấy OTP xác nhận, rồi tạo mật khẩu mới.
-            </p>
-          </div>
-
-          <label className="field">
-            <span>Số điện thoại</span>
-            <input
-              autoComplete="tel"
-              inputMode="numeric"
-              name="resetPhoneNumber"
-              placeholder="0987654321"
-              value={resetPhoneNumber}
-              onChange={(event) => setResetPhoneNumber(event.target.value)}
-            />
-          </label>
-
-          <div className="otp-panel">
-            <div className="otp-panel-header">
-              <div>
-                <strong>OTP xác nhận</strong>
-                <p className="helper-copy">Mã có hiệu lực trong 5 phút.</p>
-              </div>
-              <button
-                className="otp-send-button"
-                type="button"
-                onClick={handleSendResetOtp}
-                disabled={isSendingResetOtp || resetOtpCooldownSeconds > 0}
-              >
-                {isSendingResetOtp
-                  ? "Đang gửi OTP..."
-                  : resetOtpCooldownSeconds > 0
-                    ? `Gửi lại sau ${resetOtpCooldownSeconds}s`
-                    : "Gửi OTP"}
-              </button>
-            </div>
-
+      {showPhoneLogin ? (
+        <>
+          <form className="auth-form" onSubmit={handleSubmit}>
             <label className="field">
-              <span>Mã OTP</span>
+              <span>Số điện thoại</span>
               <input
+                autoComplete="tel"
                 inputMode="numeric"
-                name="resetOtpCode"
-                placeholder="123456"
-                value={resetOtpCode}
-                onChange={(event) => setResetOtpCode(event.target.value)}
+                name="phoneNumber"
+                placeholder="0987654321"
+                value={phoneNumber}
+                onChange={(event) => setPhoneNumber(event.target.value)}
               />
             </label>
 
-            {resetOtpPreview ? (
-              <p className="helper-copy">Mã OTP thử nghiệm trên máy local: <strong>{resetOtpPreview}</strong></p>
-            ) : null}
+            <label className="field">
+              <span>Mật khẩu</span>
+              <input
+                autoComplete="current-password"
+                name="password"
+                type="password"
+                placeholder="Ít nhất 8 ký tự"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+              />
+            </label>
+
+            {errorMessage ? <p className="form-error">{errorMessage}</p> : null}
+            {successMessage ? <p className="form-success">{successMessage}</p> : null}
+
+            <button className="primary-link auth-submit" disabled={isSubmitting} type="submit">
+              {isSubmitting ? "Đang xử lý..." : "Đăng nhập bằng số điện thoại"}
+            </button>
+          </form>
+
+          <div className="auth-inline-actions">
+            <button
+              type="button"
+              className="text-action"
+              onClick={() => {
+                setShowForgotPassword((current) => !current);
+                setResetErrorMessage(null);
+                setResetSuccessMessage(null);
+              }}
+            >
+              {showForgotPassword ? "Ẩn phần quên mật khẩu" : "Quên mật khẩu?"}
+            </button>
           </div>
 
-          <label className="field">
-            <span>Mật khẩu mới</span>
-            <input
-              autoComplete="new-password"
-              name="newPassword"
-              type="password"
-              placeholder="Ít nhất 8 ký tự"
-              value={newPassword}
-              onChange={(event) => setNewPassword(event.target.value)}
-            />
-          </label>
+          {showForgotPassword ? (
+            <form className="auth-form auth-subpanel" onSubmit={handleResetPassword}>
+              <div>
+                <h3>Đặt lại mật khẩu bằng OTP</h3>
+                <p className="helper-copy">
+                  Nhập số điện thoại, lấy OTP xác nhận, rồi tạo mật khẩu mới.
+                </p>
+              </div>
 
-          <label className="field">
-            <span>Xác nhận mật khẩu mới</span>
-            <input
-              autoComplete="new-password"
-              name="confirmNewPassword"
-              type="password"
-              placeholder="Nhập lại mật khẩu mới"
-              value={confirmNewPassword}
-              onChange={(event) => setConfirmNewPassword(event.target.value)}
-            />
-          </label>
+              <label className="field">
+                <span>Số điện thoại</span>
+                <input
+                  autoComplete="tel"
+                  inputMode="numeric"
+                  name="resetPhoneNumber"
+                  placeholder="0987654321"
+                  value={resetPhoneNumber}
+                  onChange={(event) => setResetPhoneNumber(event.target.value)}
+                />
+              </label>
 
-          {resetErrorMessage ? <p className="form-error">{resetErrorMessage}</p> : null}
-          {resetSuccessMessage ? <p className="form-success">{resetSuccessMessage}</p> : null}
+              <div className="otp-panel">
+                <div className="otp-panel-header">
+                  <div>
+                    <strong>OTP xác nhận</strong>
+                    <p className="helper-copy">Mã có hiệu lực trong 5 phút.</p>
+                  </div>
+                  <button
+                    className="otp-send-button"
+                    type="button"
+                    onClick={handleSendResetOtp}
+                    disabled={isSendingResetOtp || resetOtpCooldownSeconds > 0}
+                  >
+                    {isSendingResetOtp
+                      ? "Đang gửi OTP..."
+                      : resetOtpCooldownSeconds > 0
+                        ? `Gửi lại sau ${resetOtpCooldownSeconds}s`
+                        : "Gửi OTP"}
+                  </button>
+                </div>
 
-          <button className="primary-link auth-submit" disabled={isResettingPassword} type="submit">
-            {isResettingPassword ? "Đang cập nhật..." : "Xác nhận mật khẩu mới"}
-          </button>
-        </form>
+                <label className="field">
+                  <span>Mã OTP</span>
+                  <input
+                    inputMode="numeric"
+                    name="resetOtpCode"
+                    placeholder="123456"
+                    value={resetOtpCode}
+                    onChange={(event) => setResetOtpCode(event.target.value)}
+                  />
+                </label>
+
+                {showOtpPreview && resetOtpPreview ? (
+                  <p className="helper-copy">
+                    Mã OTP thử nghiệm trên máy local: <strong>{resetOtpPreview}</strong>
+                  </p>
+                ) : null}
+              </div>
+
+              <label className="field">
+                <span>Mật khẩu mới</span>
+                <input
+                  autoComplete="new-password"
+                  name="newPassword"
+                  type="password"
+                  placeholder="Ít nhất 8 ký tự"
+                  value={newPassword}
+                  onChange={(event) => setNewPassword(event.target.value)}
+                />
+              </label>
+
+              <label className="field">
+                <span>Xác nhận mật khẩu mới</span>
+                <input
+                  autoComplete="new-password"
+                  name="confirmNewPassword"
+                  type="password"
+                  placeholder="Nhập lại mật khẩu mới"
+                  value={confirmNewPassword}
+                  onChange={(event) => setConfirmNewPassword(event.target.value)}
+                />
+              </label>
+
+              {resetErrorMessage ? <p className="form-error">{resetErrorMessage}</p> : null}
+              {resetSuccessMessage ? <p className="form-success">{resetSuccessMessage}</p> : null}
+
+              <button
+                className="primary-link auth-submit"
+                disabled={isResettingPassword}
+                type="submit"
+              >
+                {isResettingPassword ? "Đang cập nhật..." : "Xác nhận mật khẩu mới"}
+              </button>
+            </form>
+          ) : null}
+
+          <div className="auth-divider">
+            <span>hoặc</span>
+          </div>
+        </>
       ) : null}
-
-      <div className="auth-divider">
-        <span>hoặc</span>
-      </div>
 
       <div className="social-auth-shell">
         {socialErrorMessage ? <p className="form-error">{socialErrorMessage}</p> : null}
         <SocialAuthForm />
       </div>
-
-      <p className="helper-copy">
-        Chưa có tài khoản? <Link href="/register" className="inline-text-link">Tạo tài khoản mới</Link>
-      </p>
     </div>
   );
 }

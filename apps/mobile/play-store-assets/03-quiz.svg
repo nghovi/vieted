@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920">
+  <defs>
+    <linearGradient id="bg-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fbf7ef"/>
+      <stop offset="100%" stop-color="#f1eadf"/>
+    </linearGradient>
+    <linearGradient id="local-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#edf8ee"/>
+      <stop offset="100%" stop-color="#fff7ee"/>
+    </linearGradient>
+    <linearGradient id="city-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#edf4ff"/>
+      <stop offset="100%" stop-color="#fff8f0"/>
+    </linearGradient>
+    <linearGradient id="health-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f1fbe9"/>
+      <stop offset="100%" stop-color="#fff8ef"/>
+    </linearGradient>
+    <linearGradient id="past-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f4e3cc"/>
+      <stop offset="100%" stop-color="#fff7eb"/>
+    </linearGradient>
+    <linearGradient id="exp-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff0df"/>
+      <stop offset="100%" stop-color="#f7fbff"/>
+    </linearGradient>
+  </defs>
+  <rect width="1080" height="1920" fill="url(#bg-grad)"/>
+  <circle cx="180" cy="110" r="160" fill="rgba(219,107,45,0.09)"/>
+  <circle cx="930" cy="1760" r="180" fill="rgba(31,143,107,0.08)"/>
+  <text x="88" y="110" fill="#1f8f6b" font-size="26" font-weight="700" letter-spacing="6" font-family="Georgia, 'Times New Roman', serif">TRƯỜNG ĐIỂM TA9</text>
+  
+        <text x="88" y="210" fill="#163127" font-size="66" font-weight="600" font-family="Georgia, 'Times New Roman', serif"><tspan x="88" dy="0">Làm bài ngắn để</tspan><tspan x="88" dy="89.10000000000001">biết em đang mạnh</tspan><tspan x="88" dy="89.10000000000001">và yếu ở đâu.</tspan></text>
+        <rect x="64" y="430" width="952" height="1260" rx="34" fill="#fffaf1" stroke="rgba(22,49,39,0.1)" stroke-width="2"/>
+          <text x="104" y="510" fill="#1f8f6b" font-size="24" font-weight="700" letter-spacing="4" font-family="Georgia, 'Times New Roman', serif">BỘ KIỂM TRA</text>
+          <text x="104" y="580" fill="#163127" font-size="40" font-weight="700" font-family="Georgia, 'Times New Roman', serif">Bộ câu hỏi 2</text>
+          <text x="820" y="580" fill="#5d6f68" font-size="28" font-weight="600" font-family="Georgia, 'Times New Roman', serif">3/10 câu</text>
+          <text x="104" y="670" fill="#163127" font-size="34" font-weight="700" font-family="Georgia, 'Times New Roman', serif">City life can be convenient, ____ it can also be stressful.</text>
+          <rect x="104" y="736" width="872" height="110" rx="28" fill="rgba(255,250,241,0.9)" stroke="rgba(22,49,39,0.08)"/>
+          <rect x="104" y="868" width="872" height="110" rx="28" fill="rgba(255,239,224,0.92)" stroke="rgba(219,107,45,0.3)"/>
+          <rect x="104" y="1000" width="872" height="110" rx="28" fill="rgba(255,250,241,0.9)" stroke="rgba(22,49,39,0.08)"/>
+          <rect x="104" y="1132" width="872" height="110" rx="28" fill="rgba(255,250,241,0.9)" stroke="rgba(22,49,39,0.08)"/>
+          <text x="148" y="805" fill="#163127" font-size="32" font-weight="700" font-family="Georgia, 'Times New Roman', serif">A. but</text>
+          <text x="148" y="937" fill="#163127" font-size="32" font-weight="700" font-family="Georgia, 'Times New Roman', serif">B. because</text>
+          <text x="148" y="1069" fill="#163127" font-size="32" font-weight="700" font-family="Georgia, 'Times New Roman', serif">C. so</text>
+          <text x="148" y="1201" fill="#163127" font-size="32" font-weight="700" font-family="Georgia, 'Times New Roman', serif">D. or</text>
+        
+        
+    <rect x="720" y="1732" width="256" height="96" rx="30" fill="#db6b2d" stroke="none" stroke-width="2"/>
+    <text x="848" y="1789" text-anchor="middle" fill="#fff9f2" font-size="30" font-weight="700" font-family="Georgia, 'Times New Roman', serif">Nộp bài</text>
+  
+      
+</svg>

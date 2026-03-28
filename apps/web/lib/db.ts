@@ -105,7 +105,32 @@ export type HistoryQuestionSetProgress = {
   attemptHistory: HistoryScorePoint[];
 };
 
-export type HistoryQuestionSetAttemptResult = {
+export type EnglishSkillCode =
+  | "grammar_tense"
+  | "sentence_structure"
+  | "word_form"
+  | "vocabulary_meaning"
+  | "preposition_collocation"
+  | "reading_comprehension"
+  | "error_identification"
+  | "sentence_transformation";
+
+export type EnglishSkillFeedback = {
+  skillCode: EnglishSkillCode;
+  skillLabel: string;
+  explanationVi: string;
+  hintVi: string;
+  memoryTipVi: string;
+};
+
+export type EnglishWeakSkillSummary = {
+  skillCode: EnglishSkillCode;
+  skillLabel: string;
+  wrongCount: number;
+  nextReviewAt: string | null;
+};
+
+type BaseQuestionSetAttemptResult = {
   attemptId: number;
   chapterId: string;
   chapterTitle: string;
@@ -116,15 +141,17 @@ export type HistoryQuestionSetAttemptResult = {
   totalQuestions: number;
   submittedAt: string;
   questions: Array<{
-    questionId: string;
-    prompt: string;
-    options: string[];
-    selectedOption: number;
-    correctOption: number;
-    isCorrect: boolean;
-    explanation: string;
-  }>;
+      questionId: string;
+      prompt: string;
+      options: string[];
+      selectedOption: number;
+      correctOption: number;
+      isCorrect: boolean;
+      explanation: string;
+    }>;
 };
+
+export type HistoryQuestionSetAttemptResult = BaseQuestionSetAttemptResult;
 
 export type GeographyEvaluationOverview = HistoryEvaluationOverview;
 export type GeographyChapterEvaluation = HistoryChapterEvaluation;
@@ -133,7 +160,35 @@ export type GeographyQuestionSetAttemptResult = HistoryQuestionSetAttemptResult;
 export type EnglishEvaluationOverview = HistoryEvaluationOverview;
 export type EnglishChapterEvaluation = HistoryChapterEvaluation;
 export type EnglishQuestionSetProgress = HistoryQuestionSetProgress;
-export type EnglishQuestionSetAttemptResult = HistoryQuestionSetAttemptResult;
+export type EnglishQuestionSetAttemptResult = Omit<
+  BaseQuestionSetAttemptResult,
+  "questions"
+> & {
+  weakSkills: EnglishWeakSkillSummary[];
+  dueReviewCount: number;
+  questions: Array<
+    BaseQuestionSetAttemptResult["questions"][number] & {
+      skillCode: EnglishSkillCode;
+      skillLabel: string;
+      explanationVi: string;
+      hintVi: string;
+      memoryTipVi: string;
+    }
+  >;
+};
+export type EnglishChapterLevelStatus = {
+  chapterId: string;
+  title: string;
+  index: number;
+  isUnlocked: boolean;
+  isCompleted: boolean;
+  isCurrent: boolean;
+  gateSetId: string;
+  gateSetTitle: string;
+  gateBestScore: number | null;
+  requiredSkillCount: number;
+  masteredSkillCount: number;
+};
 export type MathEvaluationOverview = HistoryEvaluationOverview;
 export type MathChapterEvaluation = HistoryChapterEvaluation;
 export type MathQuestionSetProgress = HistoryQuestionSetProgress;
@@ -194,6 +249,22 @@ type SetAttemptRow = {
 
 type InsertResult = {
   insertId: number;
+};
+
+type EnglishQuestionSkillTagRow = {
+  questionId: string;
+  skillCode: EnglishSkillCode;
+};
+
+type EnglishReviewItemRow = {
+  id: number;
+  studentId: number;
+  chapterId: string;
+  skillCode: EnglishSkillCode;
+  reps: number;
+  lapses: number;
+  intervalDays: number;
+  nextReviewAt: Date | null;
 };
 
 export const studentAvatarPresets = [
@@ -286,6 +357,220 @@ function getMasteryLabel(score: number | null) {
   }
 
   return "Cần làm lại";
+}
+
+const englishSkillLabels: Record<EnglishSkillCode, string> = {
+  grammar_tense: "Ngữ pháp và thì",
+  sentence_structure: "Cấu trúc câu",
+  word_form: "Từ loại",
+  vocabulary_meaning: "Từ vựng và nghĩa",
+  preposition_collocation: "Giới từ và kết hợp từ",
+  reading_comprehension: "Đọc hiểu",
+  error_identification: "Nhận diện lỗi sai",
+  sentence_transformation: "Biến đổi câu",
+};
+
+const srsIntervalsInDays = [1, 3, 7, 14, 30];
+
+function getEnglishSkillLabel(skillCode: EnglishSkillCode) {
+  return englishSkillLabels[skillCode];
+}
+
+function addDays(baseDate: Date, days: number) {
+  const nextDate = new Date(baseDate);
+  nextDate.setUTCDate(nextDate.getUTCDate() + days);
+  return nextDate;
+}
+
+function pickReviewIntervalDays(reps: number) {
+  return srsIntervalsInDays[Math.min(reps, srsIntervalsInDays.length - 1)];
+}
+
+function inferEnglishSkillCode(question: EnglishQuestion): EnglishSkillCode {
+  const haystack = `${question.prompt} ${question.explanation}`.toLowerCase();
+
+  if (
+    haystack.includes("preposition") ||
+    haystack.includes("between") ||
+    haystack.includes("on the corner") ||
+    haystack.includes("talk about")
+  ) {
+    return "preposition_collocation";
+  }
+
+  if (
+    haystack.includes("word form") ||
+    haystack.includes("correct form") ||
+    haystack.includes("past participle") ||
+    haystack.includes("noun") ||
+    haystack.includes("adjective") ||
+    haystack.includes("adverb")
+  ) {
+    return "word_form";
+  }
+
+  if (
+    haystack.includes("main idea") ||
+    haystack.includes("best title") ||
+    haystack.includes("main purpose") ||
+    haystack.includes("answer fits") ||
+    haystack.includes("question matches") ||
+    haystack.includes("question asks") ||
+    haystack.includes("the answer should")
+  ) {
+    return "reading_comprehension";
+  }
+
+  if (
+    haystack.includes("grammatically correct") ||
+    haystack.includes("present simple") ||
+    haystack.includes("present perfect") ||
+    haystack.includes("simple past") ||
+    haystack.includes("comparative") ||
+    haystack.includes("passive") ||
+    haystack.includes("reported speech") ||
+    haystack.includes("use 'there is'") ||
+    haystack.includes("use 'there are'") ||
+    haystack.includes("repeated or habitual") ||
+    haystack.includes("with third-person singular")
+  ) {
+    return "grammar_tense";
+  }
+
+  if (
+    haystack.includes("which sentence is correct") ||
+    haystack.includes("choose the correct sentence") ||
+    haystack.includes("contrast two ideas") ||
+    haystack.includes("expresses an opinion")
+  ) {
+    return "sentence_structure";
+  }
+
+  if (
+    haystack.includes("closest in meaning") ||
+    haystack.includes("opposite of") ||
+    haystack.includes("odd one out") ||
+    haystack.includes("best word") ||
+    haystack.includes("means") ||
+    haystack.includes("describes")
+  ) {
+    return "vocabulary_meaning";
+  }
+
+  return "vocabulary_meaning";
+}
+
+function buildEnglishSkillFeedback(
+  question: Pick<EnglishQuestion, "prompt" | "explanation">,
+  skillCode: EnglishSkillCode,
+) {
+  const skillLabel = getEnglishSkillLabel(skillCode);
+  const explanationBase = question.explanation.trim();
+  const explanationVi = `Em đang cần xem lại kỹ năng ${skillLabel.toLowerCase()}. ${explanationBase}`;
+
+  const hintBySkill: Record<EnglishSkillCode, string> = {
+    grammar_tense: "Xem kỹ dấu hiệu thời gian và cấu trúc động từ trước khi chọn đáp án.",
+    sentence_structure: "Đọc toàn câu trước, rồi kiểm tra trật tự từ và mối liên kết giữa các ý.",
+    word_form: "Nhìn từ đứng trước và sau chỗ trống để đoán từ loại cần dùng.",
+    vocabulary_meaning: "Khoanh vùng nghĩa của câu trước, rồi mới so sánh sắc thái của từng từ.",
+    preposition_collocation: "Tập trung vào cụm từ cố định hoặc quan hệ vị trí trong câu.",
+    reading_comprehension: "Tìm từ khóa trong câu hỏi và đối chiếu lại ý chính trước khi chọn.",
+    error_identification: "So từng phần của câu với mẫu đúng để phát hiện chỗ bất thường.",
+    sentence_transformation: "Giữ nguyên nghĩa gốc rồi kiểm tra lại chủ ngữ, động từ và liên từ.",
+  };
+
+  const memoryTipBySkill: Record<EnglishSkillCode, string> = {
+    grammar_tense: "Gạch nhanh dấu hiệu thời gian trước khi làm để tránh chọn theo cảm giác.",
+    sentence_structure: "Nếu một đáp án nghe thiếu tự nhiên, hãy kiểm tra lại trật tự từ trước.",
+    word_form: "Danh từ, động từ, tính từ, trạng từ thường được nhận ra nhờ vị trí trong câu.",
+    vocabulary_meaning: "Học từ theo cụm và ngữ cảnh sẽ nhớ lâu hơn học từ đơn lẻ.",
+    preposition_collocation: "Nhiều giới từ phải học theo cụm quen thuộc chứ không dịch từng chữ.",
+    reading_comprehension: "Đừng chọn đáp án chỉ vì thấy giống từ khóa; hãy kiểm tra nghĩa toàn câu.",
+    error_identification: "Mỗi lần sai hãy ghi lại đúng một mẫu lỗi để lần sau nhận ra nhanh hơn.",
+    sentence_transformation: "Luôn so sánh nghĩa gốc và nghĩa câu mới trước khi chốt đáp án.",
+  };
+
+  return {
+    skillCode,
+    skillLabel,
+    explanationVi,
+    hintVi: hintBySkill[skillCode],
+    memoryTipVi: memoryTipBySkill[skillCode],
+  } satisfies EnglishSkillFeedback;
+}
+
+async function ensureEnglishSkillInfrastructure() {
+  await pool.query(`
+    create table if not exists english_question_skill_tags (
+      id bigint primary key auto_increment,
+      question_id varchar(120) not null,
+      skill_code varchar(50) not null,
+      weight decimal(4,2) not null default 1.00,
+      created_at timestamp default current_timestamp,
+      unique key uq_english_question_skill_tags_question_skill (question_id, skill_code),
+      index idx_english_question_skill_tags_question_id (question_id),
+      constraint fk_english_question_skill_tags_question_id
+        foreign key (question_id) references english_questions(id)
+        on delete cascade
+    )
+  `);
+
+  await pool.query(`
+    create table if not exists student_english_skill_events (
+      id bigint primary key auto_increment,
+      student_id bigint not null,
+      chapter_id varchar(120) not null,
+      question_set_id varchar(120) not null,
+      question_id varchar(120) not null,
+      set_attempt_id bigint not null,
+      skill_code varchar(50) not null,
+      source varchar(20) not null default 'rule',
+      is_correct tinyint(1) not null,
+      confidence_score decimal(4,2) null,
+      mistake_type varchar(50) null,
+      explanation_vi text null,
+      hint_vi text null,
+      memory_tip_vi text null,
+      created_at datetime not null,
+      index idx_student_english_skill_events_student_id (student_id),
+      index idx_student_english_skill_events_attempt_id (set_attempt_id),
+      constraint fk_student_english_skill_events_student_id
+        foreign key (student_id) references students(id)
+        on delete cascade,
+      constraint fk_student_english_skill_events_attempt_id
+        foreign key (set_attempt_id) references student_english_set_attempts(id)
+        on delete cascade,
+      constraint fk_student_english_skill_events_question_id
+        foreign key (question_id) references english_questions(id)
+        on delete cascade
+    )
+  `);
+
+  await pool.query(`
+    create table if not exists student_english_review_items (
+      id bigint primary key auto_increment,
+      student_id bigint not null,
+      chapter_id varchar(120) not null,
+      skill_code varchar(50) not null,
+      status varchar(20) not null default 'active',
+      stability decimal(5,2) not null default 0.30,
+      difficulty decimal(5,2) not null default 0.50,
+      interval_days int not null default 1,
+      reps int not null default 0,
+      lapses int not null default 0,
+      confidence_band varchar(20) null,
+      last_result varchar(20) null,
+      last_reviewed_at datetime null,
+      next_review_at datetime null,
+      created_at timestamp default current_timestamp,
+      updated_at timestamp default current_timestamp on update current_timestamp,
+      unique key uq_student_english_review_items_student_chapter_skill (student_id, chapter_id, skill_code),
+      index idx_student_english_review_items_due (student_id, next_review_at),
+      constraint fk_student_english_review_items_student_id
+        foreign key (student_id) references students(id)
+        on delete cascade
+    )
+  `);
 }
 
 function buildAttemptHistory(attempts: SetAttemptRow[]): HistoryScorePoint[] {
@@ -1011,6 +1296,8 @@ export async function ensureGeographyContentSeeded() {
 }
 
 export async function ensureEnglishContentSeeded() {
+  await ensureEnglishSkillInfrastructure();
+
   for (const [chapterIndex, chapter] of grade9EnglishChapters.entries()) {
     const modeContent = getEnglishChapterModeContent(chapter.id);
     if (!modeContent) {
@@ -1076,6 +1363,15 @@ export async function ensureEnglishContentSeeded() {
             question.explanation,
             questionIndex + 1,
           ],
+        );
+
+        const inferredSkillCode = inferEnglishSkillCode(question);
+        await pool.query(
+          `insert into english_question_skill_tags (question_id, skill_code, weight)
+           values (?, ?, 1.00)
+           on duplicate key update
+             weight = values(weight)`,
+          [question.id, inferredSkillCode],
         );
       }
     }
@@ -1548,6 +1844,313 @@ export async function getEnglishQuestionSetByIdFromDb(chapterId: string, setId: 
     title: setRow.title,
     questions,
   };
+}
+
+async function getEnglishQuestionSkillCodeMap(questions: EnglishQuestion[]) {
+  if (questions.length === 0) {
+    return new Map<string, EnglishSkillCode>();
+  }
+
+  const [tagRows] = await pool.query(
+    `select question_id as questionId, skill_code as skillCode
+     from english_question_skill_tags
+     where question_id in (?)`,
+    [questions.map((question) => question.id)],
+  );
+
+  const tagMap = new Map<string, EnglishSkillCode>();
+  for (const row of tagRows as EnglishQuestionSkillTagRow[]) {
+    tagMap.set(row.questionId, row.skillCode);
+  }
+
+  for (const question of questions) {
+    if (!tagMap.has(question.id)) {
+      tagMap.set(question.id, inferEnglishSkillCode(question));
+    }
+  }
+
+  return tagMap;
+}
+
+async function getStudentEnglishReviewItemsMap(studentId: number, chapterId: string) {
+  const [reviewRows] = await pool.query(
+    `select
+       id,
+       student_id as studentId,
+       chapter_id as chapterId,
+       skill_code as skillCode,
+       reps,
+       lapses,
+       interval_days as intervalDays,
+       next_review_at as nextReviewAt
+     from student_english_review_items
+     where student_id = ? and chapter_id = ?`,
+    [studentId, chapterId],
+  );
+
+  return new Map(
+    (reviewRows as EnglishReviewItemRow[]).map((row) => [row.skillCode, row] as const),
+  );
+}
+
+async function upsertEnglishReviewItem(
+  studentId: number,
+  chapterId: string,
+  skillCode: EnglishSkillCode,
+  isCorrect: boolean,
+  existingItem: EnglishReviewItemRow | undefined,
+) {
+  const now = new Date();
+
+  if (isCorrect && !existingItem) {
+    return null;
+  }
+
+  if (!isCorrect) {
+    const lapses = (existingItem?.lapses ?? 0) + 1;
+    const nextReviewAt = addDays(now, 1);
+    const intervalDays = 1;
+    const reps = 0;
+
+    await pool.query(
+      `insert into student_english_review_items (
+         student_id, chapter_id, skill_code, status, stability, difficulty,
+         interval_days, reps, lapses, last_result, last_reviewed_at, next_review_at
+       ) values (?, ?, ?, 'active', ?, ?, ?, ?, ?, 'wrong', utc_timestamp(), ?)
+       on duplicate key update
+         status = values(status),
+         stability = values(stability),
+         difficulty = values(difficulty),
+         interval_days = values(interval_days),
+         reps = values(reps),
+         lapses = values(lapses),
+         last_result = values(last_result),
+         last_reviewed_at = values(last_reviewed_at),
+         next_review_at = values(next_review_at)`,
+      [
+        studentId,
+        chapterId,
+        skillCode,
+        0.25,
+        0.7,
+        intervalDays,
+        reps,
+        lapses,
+        nextReviewAt,
+      ],
+    );
+
+    return nextReviewAt;
+  }
+
+  const reps = (existingItem?.reps ?? 0) + 1;
+  const intervalDays = pickReviewIntervalDays(reps);
+  const nextReviewAt = addDays(now, intervalDays);
+
+  await pool.query(
+    `update student_english_review_items
+     set status = 'active',
+         stability = ?,
+         difficulty = ?,
+         interval_days = ?,
+         reps = ?,
+         last_result = 'correct',
+         last_reviewed_at = utc_timestamp(),
+         next_review_at = ?
+     where student_id = ? and chapter_id = ? and skill_code = ?`,
+    [0.4 + reps * 0.15, 0.4, intervalDays, reps, nextReviewAt, studentId, chapterId, skillCode],
+  );
+
+  return nextReviewAt;
+}
+
+export async function listDueEnglishReviewItems(
+  studentId: number,
+  chapterId?: string,
+) {
+  await ensureEnglishContentSeeded();
+
+  const params: Array<number | string> = [studentId];
+  let chapterFilter = "";
+  if (chapterId) {
+    chapterFilter = " and chapter_id = ?";
+    params.push(chapterId);
+  }
+
+  const [reviewRows] = await pool.query(
+    `select
+       chapter_id as chapterId,
+       skill_code as skillCode,
+       interval_days as intervalDays,
+       reps,
+       lapses,
+       next_review_at as nextReviewAt,
+       last_result as lastResult
+     from student_english_review_items
+     where student_id = ?
+       ${chapterFilter}
+       and next_review_at is not null
+       and next_review_at <= utc_timestamp()
+     order by next_review_at asc, updated_at desc`,
+    params,
+  );
+
+  return (reviewRows as Array<{
+    chapterId: string;
+    skillCode: EnglishSkillCode;
+    intervalDays: number;
+    reps: number;
+    lapses: number;
+    nextReviewAt: Date;
+    lastResult: string | null;
+  }>).map((row) => ({
+    chapterId: row.chapterId,
+    skillCode: row.skillCode,
+    skillLabel: getEnglishSkillLabel(row.skillCode),
+    intervalDays: row.intervalDays,
+    reps: row.reps,
+    lapses: row.lapses,
+    nextReviewAt: row.nextReviewAt.toISOString(),
+    lastResult: row.lastResult,
+  }));
+}
+
+function getEnglishChapterSkillCodes(chapter: (typeof grade9EnglishChapters)[number]) {
+  return [...new Set(chapter.questionSets.flatMap((set) => set.questions.map(inferEnglishSkillCode)))];
+}
+
+export async function getEnglishChapterLevelStatuses(
+  studentId: number | null | undefined,
+  selectedChapterId?: string,
+) {
+  await ensureEnglishContentSeeded();
+
+  if (!studentId) {
+    return grade9EnglishChapters.map((chapter, index) => {
+      const gateSet = chapter.questionSets[chapter.questionSets.length - 1];
+      return {
+        chapterId: chapter.id,
+        title: chapter.title,
+        index,
+        isUnlocked: index === 0,
+        isCompleted: false,
+        isCurrent: index === 0,
+        gateSetId: gateSet.id,
+        gateSetTitle: gateSet.title,
+        gateBestScore: null,
+        requiredSkillCount: getEnglishChapterSkillCodes(chapter).length,
+        masteredSkillCount: 0,
+      } satisfies EnglishChapterLevelStatus;
+    });
+  }
+
+  const [attemptRows] = await pool.query(
+    `select
+       a.chapter_id as chapterId,
+       a.question_set_id as questionSetId,
+       max(a.score_percent) as bestScore
+     from student_english_set_attempts a
+     where a.student_id = ?
+     group by a.chapter_id, a.question_set_id`,
+    [studentId],
+  );
+
+  const [skillRows] = await pool.query(
+    `select
+       chapter_id as chapterId,
+       skill_code as skillCode,
+       sum(case when is_correct = 1 then 1 else 0 end) as correctCount,
+       count(*) as totalCount
+     from student_english_skill_events
+     where student_id = ?
+     group by chapter_id, skill_code`,
+    [studentId],
+  );
+
+  const bestScoreMap = new Map<string, number>();
+  for (const row of attemptRows as Array<{
+    chapterId: string;
+    questionSetId: string;
+    bestScore: number | string;
+  }>) {
+    bestScoreMap.set(
+      `${row.chapterId}:${row.questionSetId}`,
+      Number(row.bestScore),
+    );
+  }
+
+  const skillAccuracyMap = new Map<string, number>();
+  for (const row of skillRows as Array<{
+    chapterId: string;
+    skillCode: EnglishSkillCode;
+    correctCount: number | string;
+    totalCount: number | string;
+  }>) {
+    const totalCount = Number(row.totalCount);
+    const correctCount = Number(row.correctCount);
+    skillAccuracyMap.set(
+      `${row.chapterId}:${row.skillCode}`,
+      totalCount > 0 ? (correctCount / totalCount) * 100 : 0,
+    );
+  }
+
+  let unlockedSoFar = true;
+  let foundCurrent = false;
+
+  const statuses = grade9EnglishChapters.map((chapter, index) => {
+    const gateSet = chapter.questionSets[chapter.questionSets.length - 1];
+    const gateBestScore = bestScoreMap.get(`${chapter.id}:${gateSet.id}`) ?? null;
+    const skillCodes = getEnglishChapterSkillCodes(chapter);
+    const masteredSkillCount = skillCodes.filter((skillCode) => {
+      const accuracy = skillAccuracyMap.get(`${chapter.id}:${skillCode}`) ?? 0;
+      return accuracy >= 80;
+    }).length;
+    const isCompleted =
+      gateBestScore !== null &&
+      gateBestScore >= 80 &&
+      masteredSkillCount === skillCodes.length;
+    const isUnlocked = index === 0 ? true : unlockedSoFar;
+    const isSelected = selectedChapterId === chapter.id;
+    const isCurrent = isUnlocked && !foundCurrent && (isSelected || !selectedChapterId);
+
+    if (isCurrent) {
+      foundCurrent = true;
+    }
+
+    unlockedSoFar = unlockedSoFar && isCompleted;
+
+    return {
+      chapterId: chapter.id,
+      title: chapter.title,
+      index,
+      isUnlocked,
+      isCompleted,
+      isCurrent,
+      gateSetId: gateSet.id,
+      gateSetTitle: gateSet.title,
+      gateBestScore,
+      requiredSkillCount: skillCodes.length,
+      masteredSkillCount,
+    } satisfies EnglishChapterLevelStatus;
+  });
+
+  if (!statuses.some((status) => status.isCurrent)) {
+    const fallbackStatus = [...statuses].reverse().find((status) => status.isUnlocked) ?? statuses[0];
+    return statuses.map((status) => ({
+      ...status,
+      isCurrent: status.chapterId === fallbackStatus.chapterId,
+    }));
+  }
+
+  return statuses;
+}
+
+export async function canStudentAccessEnglishChapter(
+  studentId: number | null | undefined,
+  chapterId: string,
+) {
+  const statuses = await getEnglishChapterLevelStatuses(studentId, chapterId);
+  return statuses.find((status) => status.chapterId === chapterId) ?? null;
 }
 
 export async function listMathChaptersFromDb() {
@@ -2294,9 +2897,14 @@ export async function submitEnglishQuestionSetAttempt(
     };
   }
 
+  const skillCodeMap = await getEnglishQuestionSkillCodeMap(questionSet.questions);
+
   const gradedQuestions = questionSet.questions.map((question) => {
     const selectedOption = answerMap.get(question.id)!;
     const isCorrect = selectedOption === question.correctOption;
+    const skillCode =
+      skillCodeMap.get(question.id) ?? inferEnglishSkillCode(question);
+    const skillFeedback = buildEnglishSkillFeedback(question, skillCode);
 
     return {
       questionId: question.id,
@@ -2306,6 +2914,7 @@ export async function submitEnglishQuestionSetAttempt(
       correctOption: question.correctOption,
       isCorrect,
       explanation: question.explanation,
+      ...skillFeedback,
     };
   });
 
@@ -2322,6 +2931,11 @@ export async function submitEnglishQuestionSetAttempt(
   );
 
   const attemptId = (insertedAttempt as InsertResult).insertId;
+  const existingReviewItems = await getStudentEnglishReviewItemsMap(studentId, chapterId);
+  const weakSkillState = new Map<
+    EnglishSkillCode,
+    { wrongCount: number; nextReviewAt: string | null }
+  >();
 
   for (const question of gradedQuestions) {
     await pool.query(
@@ -2339,6 +2953,63 @@ export async function submitEnglishQuestionSetAttempt(
         question.isCorrect ? 1 : 0,
       ],
     );
+
+    await pool.query(
+      `insert into student_english_skill_events (
+         student_id, chapter_id, question_set_id, question_id, set_attempt_id, skill_code,
+         source, is_correct, confidence_score, mistake_type, explanation_vi, hint_vi,
+         memory_tip_vi, created_at
+       ) values (?, ?, ?, ?, ?, ?, 'rule', ?, ?, ?, ?, ?, ?, utc_timestamp())`,
+      [
+        studentId,
+        chapterId,
+        setId,
+        question.questionId,
+        attemptId,
+        question.skillCode,
+        question.isCorrect ? 1 : 0,
+        null,
+        question.skillCode,
+        question.explanationVi,
+        question.hintVi,
+        question.memoryTipVi,
+      ],
+    );
+
+    const nextReviewAt = await upsertEnglishReviewItem(
+      studentId,
+      chapterId,
+      question.skillCode,
+      question.isCorrect,
+      existingReviewItems.get(question.skillCode),
+    );
+
+    if (nextReviewAt) {
+      existingReviewItems.set(question.skillCode, {
+        id: existingReviewItems.get(question.skillCode)?.id ?? 0,
+        studentId,
+        chapterId,
+        skillCode: question.skillCode,
+        reps: question.isCorrect
+          ? (existingReviewItems.get(question.skillCode)?.reps ?? 0) + 1
+          : 0,
+        lapses: question.isCorrect
+          ? existingReviewItems.get(question.skillCode)?.lapses ?? 0
+          : (existingReviewItems.get(question.skillCode)?.lapses ?? 0) + 1,
+        intervalDays: question.isCorrect
+          ? pickReviewIntervalDays((existingReviewItems.get(question.skillCode)?.reps ?? 0) + 1)
+          : 1,
+        nextReviewAt,
+      });
+    }
+
+    if (!question.isCorrect) {
+      const currentWeakSkill = weakSkillState.get(question.skillCode);
+      weakSkillState.set(question.skillCode, {
+        wrongCount: (currentWeakSkill?.wrongCount ?? 0) + 1,
+        nextReviewAt: nextReviewAt ? nextReviewAt.toISOString() : null,
+      });
+    }
   }
 
   await pool.query(
@@ -2354,6 +3025,28 @@ export async function submitEnglishQuestionSetAttempt(
     [studentId, chapterId],
   );
 
+  const weakSkills = [...weakSkillState.entries()]
+    .map(([skillCode, state]) => ({
+      skillCode,
+      skillLabel: getEnglishSkillLabel(skillCode),
+      wrongCount: state.wrongCount,
+      nextReviewAt: state.nextReviewAt,
+    }))
+    .sort((left, right) => right.wrongCount - left.wrongCount);
+
+  const [dueCountRows] = await pool.query(
+    `select count(*) as total
+     from student_english_review_items
+     where student_id = ?
+       and next_review_at is not null
+       and next_review_at <= utc_timestamp()`,
+    [studentId],
+  );
+
+  const dueReviewCount = Number(
+    (dueCountRows as Array<{ total: number | string }>)[0]?.total ?? 0,
+  );
+
   return {
     ok: true as const,
     result: {
@@ -2366,6 +3059,8 @@ export async function submitEnglishQuestionSetAttempt(
       correctCount,
       totalQuestions,
       submittedAt: new Date().toISOString(),
+      weakSkills,
+      dueReviewCount,
       questions: gradedQuestions,
     } satisfies EnglishQuestionSetAttemptResult,
   };

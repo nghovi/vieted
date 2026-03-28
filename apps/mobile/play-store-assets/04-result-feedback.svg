@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920">
+  <defs>
+    <linearGradient id="bg-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fbf7ef"/>
+      <stop offset="100%" stop-color="#f1eadf"/>
+    </linearGradient>
+    <linearGradient id="local-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#edf8ee"/>
+      <stop offset="100%" stop-color="#fff7ee"/>
+    </linearGradient>
+    <linearGradient id="city-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#edf4ff"/>
+      <stop offset="100%" stop-color="#fff8f0"/>
+    </linearGradient>
+    <linearGradient id="health-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f1fbe9"/>
+      <stop offset="100%" stop-color="#fff8ef"/>
+    </linearGradient>
+    <linearGradient id="past-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f4e3cc"/>
+      <stop offset="100%" stop-color="#fff7eb"/>
+    </linearGradient>
+    <linearGradient id="exp-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff0df"/>
+      <stop offset="100%" stop-color="#f7fbff"/>
+    </linearGradient>
+  </defs>
+  <rect width="1080" height="1920" fill="url(#bg-grad)"/>
+  <circle cx="180" cy="110" r="160" fill="rgba(219,107,45,0.09)"/>
+  <circle cx="930" cy="1760" r="180" fill="rgba(31,143,107,0.08)"/>
+  <text x="88" y="110" fill="#1f8f6b" font-size="26" font-weight="700" letter-spacing="6" font-family="Georgia, 'Times New Roman', serif">TRƯỜNG ĐIỂM TA9</text>
+  
+        <text x="88" y="210" fill="#163127" font-size="64" font-weight="600" font-family="Georgia, 'Times New Roman', serif"><tspan x="88" dy="0">Thấy ngay lỗi sai,</tspan><tspan x="88" dy="86.4">gợi ý và mẹo nhớ</tspan><tspan x="88" dy="86.4">sau mỗi lần làm</tspan><tspan x="88" dy="86.4">bài.</tspan></text>
+        <rect x="64" y="430" width="952" height="240" rx="34" fill="#fffaf1" stroke="rgba(22,49,39,0.1)" stroke-width="2"/>
+          <text x="104" y="520" fill="#163127" font-size="56" font-weight="700" font-family="Georgia, 'Times New Roman', serif">80%</text>
+          <text x="104" y="586" fill="#5d6f68" font-size="30" font-weight="500" font-family="Georgia, 'Times New Roman', serif">8/10 câu đúng • 2 kỹ năng cần ưu tiên</text>
+          <text x="640" y="552" fill="#1f8f6b" font-size="30" font-weight="700" font-family="Georgia, 'Times New Roman', serif">Ôn tập đến hạn: 2</text>
+        
+        <rect x="64" y="710" width="952" height="440" rx="34" fill="#fffaf1" stroke="rgba(22,49,39,0.1)" stroke-width="2"/>
+          <text x="104" y="790" fill="#163127" font-size="34" font-weight="700" font-family="Georgia, 'Times New Roman', serif">Điểm yếu cần sửa ngay</text>
+          <rect x="104" y="840" width="398" height="220" rx="28" fill="url(#city-grad)"/>
+          <rect x="518" y="840" width="458" height="220" rx="28" fill="url(#local-grad)"/>
+          <text x="138" y="910" fill="#163127" font-size="30" font-weight="700" font-family="Georgia, 'Times New Roman', serif">Cấu trúc câu</text>
+          <text x="138" y="962" fill="#5d6f68" font-size="26" font-weight="500" font-family="Georgia, 'Times New Roman', serif">2 câu sai • ôn lại hôm nay</text>
+          <text x="552" y="910" fill="#163127" font-size="30" font-weight="700" font-family="Georgia, 'Times New Roman', serif">Giới từ và cụm từ</text>
+          <text x="552" y="962" fill="#5d6f68" font-size="26" font-weight="500" font-family="Georgia, 'Times New Roman', serif">1 câu sai • gợi ý luyện tiếp</text>
+        
+        <rect x="64" y="1180" width="952" height="520" rx="34" fill="#fffaf1" stroke="rgba(22,49,39,0.1)" stroke-width="2"/>
+          <text x="104" y="1260" fill="#163127" font-size="34" font-weight="700" font-family="Georgia, 'Times New Roman', serif">Giải thích thêm</text>
+          <text x="104" y="1338" fill="#5d6f68" font-size="28" font-weight="500" font-family="Georgia, 'Times New Roman', serif">Em sai ở: Cấu trúc câu</text>
+          <text x="104" y="1410" fill="#163127" font-size="30" font-weight="600" font-family="Georgia, 'Times New Roman', serif">Vì sao sai:</text>
+          <text x="104" y="1460" fill="#5d6f68" font-size="28" font-weight="500" font-family="Georgia, 'Times New Roman', serif">Câu này cần liên từ nối hai ý đối lập nên đáp án đúng là "but".</text>
+          <text x="104" y="1534" fill="#163127" font-size="30" font-weight="600" font-family="Georgia, 'Times New Roman', serif">Mẹo nhớ:</text>
+          <text x="104" y="1584" fill="#5d6f68" font-size="28" font-weight="500" font-family="Georgia, 'Times New Roman', serif">Khi hai vế mang ý trái nhau, hãy kiểm tra các từ nối như but, however.</text>
+        
+      
+</svg>

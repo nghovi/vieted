@@ -348,6 +348,19 @@ await connection.query(`
       on delete cascade
   );
 
+  create table if not exists english_question_skill_tags (
+    id bigint primary key auto_increment,
+    question_id varchar(120) not null,
+    skill_code varchar(50) not null,
+    weight decimal(4,2) not null default 1.00,
+    created_at timestamp default current_timestamp,
+    unique key uq_english_question_skill_tags_question_skill (question_id, skill_code),
+    index idx_english_question_skill_tags_question_id (question_id),
+    constraint fk_english_question_skill_tags_question_id
+      foreign key (question_id) references english_questions(id)
+      on delete cascade
+  );
+
   create table if not exists student_english_chapter_progress (
     student_id bigint not null,
     chapter_id varchar(120) not null,
@@ -402,6 +415,59 @@ await connection.query(`
       on delete cascade,
     constraint fk_student_english_question_attempts_question_id
       foreign key (question_id) references english_questions(id)
+      on delete cascade
+  );
+
+  create table if not exists student_english_skill_events (
+    id bigint primary key auto_increment,
+    student_id bigint not null,
+    chapter_id varchar(120) not null,
+    question_set_id varchar(120) not null,
+    question_id varchar(120) not null,
+    set_attempt_id bigint not null,
+    skill_code varchar(50) not null,
+    source varchar(20) not null default 'rule',
+    is_correct tinyint(1) not null,
+    confidence_score decimal(4,2) null,
+    mistake_type varchar(50) null,
+    explanation_vi text null,
+    hint_vi text null,
+    memory_tip_vi text null,
+    created_at datetime not null,
+    index idx_student_english_skill_events_student_id (student_id),
+    index idx_student_english_skill_events_attempt_id (set_attempt_id),
+    constraint fk_student_english_skill_events_student_id
+      foreign key (student_id) references students(id)
+      on delete cascade,
+    constraint fk_student_english_skill_events_attempt_id
+      foreign key (set_attempt_id) references student_english_set_attempts(id)
+      on delete cascade,
+    constraint fk_student_english_skill_events_question_id
+      foreign key (question_id) references english_questions(id)
+      on delete cascade
+  );
+
+  create table if not exists student_english_review_items (
+    id bigint primary key auto_increment,
+    student_id bigint not null,
+    chapter_id varchar(120) not null,
+    skill_code varchar(50) not null,
+    status varchar(20) not null default 'active',
+    stability decimal(5,2) not null default 0.30,
+    difficulty decimal(5,2) not null default 0.50,
+    interval_days int not null default 1,
+    reps int not null default 0,
+    lapses int not null default 0,
+    confidence_band varchar(20) null,
+    last_result varchar(20) null,
+    last_reviewed_at datetime null,
+    next_review_at datetime null,
+    created_at timestamp default current_timestamp,
+    updated_at timestamp default current_timestamp on update current_timestamp,
+    unique key uq_student_english_review_items_student_chapter_skill (student_id, chapter_id, skill_code),
+    index idx_student_english_review_items_due (student_id, next_review_at),
+    constraint fk_student_english_review_items_student_id
+      foreign key (student_id) references students(id)
       on delete cascade
   );
 

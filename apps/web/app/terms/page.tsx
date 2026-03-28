@@ -3,7 +3,7 @@ import Link from "next/link";
 const termsSections = [
   {
     title: "1. Phạm vi áp dụng",
-    body: "Điều khoản dịch vụ này áp dụng cho website và ứng dụng của Trường Điểm Online, bao gồm các chức năng tạo tài khoản, đăng nhập, học tập, làm bài kiểm tra, theo dõi tiến độ và quản lý hồ sơ học sinh.",
+    body: "Điều khoản dịch vụ này áp dụng cho ứng dụng Trường điểm - Tiếng Anh 9 và website Trường Điểm Online tại truongdiem.online, bao gồm các chức năng tạo tài khoản, đăng nhập, học tập, làm bài kiểm tra, theo dõi tiến độ và quản lý hồ sơ học sinh.",
   },
   {
     title: "2. Điều kiện sử dụng",
@@ -11,7 +11,7 @@ const termsSections = [
   },
   {
     title: "3. Tài khoản và xác thực",
-    body: "Trường Điểm Online có thể cung cấp đăng ký hoặc đăng nhập bằng số điện thoại, OTP hoặc tài khoản mạng xã hội được hỗ trợ. Chúng tôi có thể tạm ngừng hoặc từ chối quyền truy cập nếu phát hiện thông tin giả mạo, lạm dụng hoặc hành vi ảnh hưởng đến an toàn hệ thống.",
+    body: "Trường điểm - Tiếng Anh 9 có thể cung cấp đăng ký hoặc đăng nhập bằng số điện thoại, OTP hoặc tài khoản mạng xã hội được hỗ trợ. Chúng tôi có thể tạm ngừng hoặc từ chối quyền truy cập nếu phát hiện thông tin giả mạo, lạm dụng hoặc hành vi ảnh hưởng đến an toàn hệ thống.",
   },
   {
     title: "4. Nội dung và mục đích sử dụng",
@@ -23,7 +23,7 @@ const termsSections = [
   },
   {
     title: "6. Dữ liệu và quyền riêng tư",
-    body: "Việc thu thập, sử dụng và lưu trữ dữ liệu cá nhân được thực hiện theo Chính sách quyền riêng tư của Trường Điểm Online. Khi sử dụng dịch vụ, người dùng đồng ý với các hoạt động xử lý dữ liệu cần thiết để vận hành tài khoản và cung cấp trải nghiệm học tập.",
+    body: "Việc thu thập, sử dụng và lưu trữ dữ liệu cá nhân được thực hiện theo Chính sách quyền riêng tư của Trường điểm - Tiếng Anh 9. Khi sử dụng dịch vụ, người dùng đồng ý với các hoạt động xử lý dữ liệu cần thiết để vận hành tài khoản và cung cấp trải nghiệm học tập.",
   },
   {
     title: "7. Tạm ngừng hoặc chấm dứt dịch vụ",
@@ -31,7 +31,7 @@ const termsSections = [
   },
   {
     title: "8. Giới hạn trách nhiệm",
-    body: "Trường Điểm Online nỗ lực duy trì dịch vụ ổn định và chính xác, nhưng không cam kết dịch vụ luôn liên tục, không gián đoạn hoặc hoàn toàn không có lỗi. Trong phạm vi pháp luật cho phép, chúng tôi không chịu trách nhiệm cho các thiệt hại phát sinh gián tiếp từ việc sử dụng hoặc không thể sử dụng dịch vụ.",
+    body: "Trường điểm - Tiếng Anh 9 nỗ lực duy trì dịch vụ ổn định và chính xác, nhưng không cam kết dịch vụ luôn liên tục, không gián đoạn hoặc hoàn toàn không có lỗi. Trong phạm vi pháp luật cho phép, chúng tôi không chịu trách nhiệm cho các thiệt hại phát sinh gián tiếp từ việc sử dụng hoặc không thể sử dụng dịch vụ.",
   },
   {
     title: "9. Thay đổi điều khoản",
@@ -49,10 +49,11 @@ export default function TermsPage() {
       <section className="hero auth-hero">
         <div className="hero-copy">
           <p className="eyebrow">Điều khoản dịch vụ</p>
-          <h1>Điều khoản sử dụng dành cho website và ứng dụng của Trường Điểm Online.</h1>
+          <h1>Điều khoản sử dụng dành cho ứng dụng Trường điểm - Tiếng Anh 9.</h1>
           <p className="lede">
             Trang này mô tả các điều kiện sử dụng dịch vụ, quyền và trách nhiệm của
-            người dùng khi truy cập và sử dụng Trường Điểm Online.
+            người dùng khi truy cập và sử dụng Trường điểm - Tiếng Anh 9 trên hệ thống
+            Trường Điểm Online.
           </p>
           <div className="hero-actions">
             <Link href="/privacy" className="secondary-link">
@@ -68,8 +69,8 @@ export default function TermsPage() {
           <h2>Tóm tắt nhanh</h2>
           <ul>
             <li>
-              <span>Dịch vụ</span>
-              <strong>Học tập, làm bài kiểm tra và theo dõi tiến độ</strong>
+              <span>Ứng dụng</span>
+              <strong>Trường điểm - Tiếng Anh 9</strong>
             </li>
             <li>
               <span>Tài khoản</span>

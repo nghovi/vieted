@@ -164,7 +164,43 @@ export function EnglishTestForm({
                     : "Em nên học lại phần kiến thức chính rồi làm lại bộ này."}
               </p>
             </article>
+            <article className="feature-card">
+              <h3>Ôn tập hôm nay</h3>
+              <p>
+                {result.dueReviewCount > 0
+                  ? `Em đang có ${result.dueReviewCount} mục ôn tập đến hạn trong hàng đợi.`
+                  : "Chưa có mục ôn tập đến hạn. Hãy tiếp tục giữ nhịp học đều."}
+              </p>
+            </article>
           </div>
+
+          {result.weakSkills.length > 0 ? (
+            <div className="feature-card">
+              <div className="test-toolbar">
+                <div>
+                  <h3>Điểm yếu cần sửa ngay</h3>
+                  <p>Đây là những kỹ năng vừa kéo điểm của em xuống trong lần làm này.</p>
+                </div>
+                <Link href={`/english/grade-9/${chapterId}/review`} className="secondary-link">
+                  Mở trang ôn tập
+                </Link>
+              </div>
+              <div className="question-set">
+                {result.weakSkills.map((skill) => (
+                  <article key={skill.skillCode} className="feature-card">
+                    <h3>{skill.skillLabel}</h3>
+                    <p>Số câu sai: {skill.wrongCount}</p>
+                    <p>
+                      Lần ôn tiếp theo:{" "}
+                      {skill.nextReviewAt
+                        ? new Date(skill.nextReviewAt).toLocaleString("vi-VN")
+                        : "Hệ thống sẽ xếp lịch sau"}
+                    </p>
+                  </article>
+                ))}
+              </div>
+            </div>
+          ) : null}
 
           <div className="feature-card">
             <div className="test-toolbar">
@@ -218,6 +254,11 @@ export function EnglishTestForm({
                     ? "Đúng. Em đã chọn chính xác đáp án của câu này."
                     : "Sai. Hãy so sánh đáp án em chọn với đáp án đúng ở bên dưới."}
                 </p>
+                {!question.isCorrect ? (
+                  <div className="result-summary">
+                    <strong>Em sai ở:</strong> {question.skillLabel}
+                  </div>
+                ) : null}
                 <div className="result-options">
                   {question.options.map((option, optionIndex) => {
                     const optionLabel = String.fromCharCode(65 + optionIndex);
@@ -253,6 +294,19 @@ export function EnglishTestForm({
                   })}
                 </div>
                 <p className="result-explanation">{question.explanation}</p>
+                {!question.isCorrect ? (
+                  <>
+                    <p className="result-explanation">
+                      <strong>Giải thích thêm:</strong> {question.explanationVi}
+                    </p>
+                    <p className="result-explanation">
+                      <strong>Gợi ý:</strong> {question.hintVi}
+                    </p>
+                    <p className="result-explanation">
+                      <strong>Mẹo nhớ:</strong> {question.memoryTipVi}
+                    </p>
+                  </>
+                ) : null}
               </article>
             ))}
           </div>

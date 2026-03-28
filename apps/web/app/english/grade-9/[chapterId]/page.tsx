@@ -1,7 +1,11 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getServerSessionStudent } from "@/lib/auth";
-import { getEnglishChapterByIdFromDb, getEnglishChapterEvaluation } from "@/lib/db";
+import {
+  canStudentAccessEnglishChapter,
+  getEnglishChapterByIdFromDb,
+  getEnglishChapterEvaluation,
+} from "@/lib/db";
 
 type Props = {
   params: Promise<{ chapterId: string }>;
@@ -10,6 +14,8 @@ type Props = {
 export default async function EnglishChapterPage({ params }: Props) {
   const { chapterId } = await params;
   const student = await getServerSessionStudent();
+  const access = await canStudentAccessEnglishChapter(student?.dbId ?? null, chapterId);
+  if (!access?.isUnlocked) redirect("/");
   const chapter = await getEnglishChapterByIdFromDb(chapterId);
   const evaluation =
     student ? await getEnglishChapterEvaluation(student.dbId, chapterId) : null;

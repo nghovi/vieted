@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import Link from "next/link";
 import { LoginForm } from "./login-form";
 
 export default function LoginPage() {
@@ -8,10 +7,9 @@ export default function LoginPage() {
       <section className="hero auth-hero">
         <div className="hero-copy">
           <p className="eyebrow">Đăng nhập học sinh</p>
-          <h1>Đăng nhập bằng số điện thoại, Gmail, Facebook hoặc TikTok.</h1>
+          <h1>Chọn tài khoản để vào học ngay.</h1>
           <p className="lede">
-            Trang này dành cho tài khoản đã đăng ký trước đó. Nếu học sinh chưa có tài
-            khoản, hãy sang trang <Link href="/register" className="inline-text-link">đăng ký</Link> để tạo tài khoản bằng số điện thoại.
+            Tiếp tục với Gmail, Facebook hoặc TikTok để bắt đầu học và lưu tiến độ.
           </p>
         </div>
 

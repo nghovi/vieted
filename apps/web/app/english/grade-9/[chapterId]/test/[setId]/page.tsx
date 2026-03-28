@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getServerSessionStudent } from "@/lib/auth";
 import {
+  canStudentAccessEnglishChapter,
   getEnglishQuestionSetByIdFromDb,
   getLatestEnglishQuestionSetAttempt,
   listEnglishQuestionSetsWithProgress,
@@ -16,6 +17,8 @@ export default async function EnglishSetAttemptPage({ params }: Props) {
   const { chapterId, setId } = await params;
   const student = await getServerSessionStudent();
   if (!student) redirect("/login");
+  const access = await canStudentAccessEnglishChapter(student.dbId, chapterId);
+  if (!access?.isUnlocked) redirect("/");
 
   const questionSet = await getEnglishQuestionSetByIdFromDb(chapterId, setId);
   const latestAttempt = await getLatestEnglishQuestionSetAttempt(student.dbId, chapterId, setId);
